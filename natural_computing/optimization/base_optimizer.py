@@ -1,6 +1,6 @@
 """
 BaseOptimizer Interface
-This module defines the interface for optimization algorithms.
+    This module defines the interface for optimization algorithms.
 
 Classes:
     BaseOptimizer: The base interface for optimization algorithms.
