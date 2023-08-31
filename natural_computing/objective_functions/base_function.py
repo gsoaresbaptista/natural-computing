@@ -20,10 +20,14 @@ class BaseFunction(ABC):
     """
 
     @abstractmethod
-    def evaluate(self, point: List[float]):
+    def evaluate(self, point: List[float]) -> float:
         """
         Evaluate the function at the given point.
 
         Args:
             point: The Rn point at which to evaluate the function.
+
+        Returns:
+            float value indicates the fitness of the point with the
+            current objective function.
         """
