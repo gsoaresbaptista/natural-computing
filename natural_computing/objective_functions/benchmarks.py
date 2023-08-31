@@ -19,16 +19,21 @@ class RastriginFunction(BaseFunction):
 
     Args:
         dimension (int): The dimensionality of the Rastrigin function.
+        factor (int): The value of the factor that each point is divided before
+            calculate the function.
 
     Attributes:
         dimension (int): The dimensionality of the Rastrigin function.
+        factor (int): The value of the factor that each point is divided before
+            calculate the function.
 
     Methods:
         evaluate(x): Evaluate the Rastrigin function at the given point.
     """
 
-    def __init__(self, dimension):
+    def __init__(self, dimension: int, factor: float = 1.0):
         self.dimension = dimension
+        self.factor = factor
 
     def evaluate(self, point: List[float]) -> float:
         """
@@ -43,5 +48,6 @@ class RastriginFunction(BaseFunction):
         a_const = 10
         value = a_const * self.dimension
         for x_i in point:
+            x_i /= self.factor
             value += x_i**2 - a_const * math.cos(2 * math.pi * x_i)
         return value
