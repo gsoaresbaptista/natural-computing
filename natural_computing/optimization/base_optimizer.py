@@ -24,14 +24,11 @@ class BaseOptimizer(ABC):
     def optimize(
         self,
         objective_function: BaseFunction,
-        iterations: int,
-    ):
+    ) -> None:
         """
         Optimize the given objective function.
 
         Args:
             objective_function (BaseFunction): The objective function to be
                 optimized.
-
-            iterations (int): The number of optimization iterations.
         """
