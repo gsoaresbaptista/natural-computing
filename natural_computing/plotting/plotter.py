@@ -12,6 +12,7 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
+from matplotlib.axes import Axes
 
 from natural_computing.objective_functions import BaseFunction
 
@@ -32,7 +33,7 @@ class Plotter:
         x_range: Tuple[float, float],
         y_range: Tuple[float, float],
         num_points: int = 40,
-    ) -> None:
+    ) -> Axes:
         """
         Draws the given objective function.
 
