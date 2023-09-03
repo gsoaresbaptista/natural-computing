@@ -46,8 +46,7 @@ class RastriginFunction(BaseFunction):
             float: The value of the Rastrigin function at the given point.
         """
         a_const = 10
-        value = a_const * self.dimension
+        value: float = a_const * self.dimension
         for x_i in point:
-            x_i /= self.factor
             value += x_i**2 - a_const * math.cos(2 * math.pi * x_i)
         return value

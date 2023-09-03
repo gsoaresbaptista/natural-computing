@@ -209,3 +209,118 @@ class ParticleSwarmOptimization(BaseOptimizer):
             min(max(x, x_min), x_max)
             for x, (x_min, x_max) in zip(new_pos, self.search_space)
         ]
+
+
+class BareBonesParticleSwarmOptimization(BaseOptimizer):
+    """
+    BareBones Particle Swarm Optimization (BB-PSO) algorithm implementation.
+
+    Args:
+        num_particles (int): The number of particles in the swarm.
+        max_iterations (int): The maximum number of optimization iterations.
+        search_space (list of tuples): The search space for initial particle
+            positions.
+
+    Attributes:
+        num_particles (int): The number of particles in the swarm.
+        max_iterations (int): The maximum number of optimization iterations.
+        search_space (list of tuples): The search space for initial particle
+            positions.
+        best_global_position (list): The best global position found during
+            optimization.
+        best_global_value (float): The value of the objective function at
+            the best global position.
+        particles (list of dict): List of particle dictionaries.
+
+    Methods:
+        initialize_particles(): Initialize particles with random positions and
+            velocities.
+        optimize(objective_function): Optimize the given objective function
+            using BB-PSO.
+    """
+
+    def __init__(
+        self,
+        num_particles: int,
+        max_iterations: int,
+        search_space: List[Tuple[float, float]],
+    ) -> None:
+        self.num_particles: int = num_particles
+        self.max_iterations: int = max_iterations
+        self.search_space: List[Tuple[float, float]] = search_space
+        self.best_global_position: List[float] = [0.0 for _ in search_space]
+        self.best_global_value = float('inf')
+        self.particles: List[Dict[str, float | List[float]]] = []
+
+    def initialize_particles(self) -> None:
+        """
+        Initialize particles with random positions and velocities.
+        """
+        # clear current particles
+        self.particles.clear()
+
+        # generate each particle
+        for _ in range(self.num_particles):
+            initial_position = [
+                random.uniform(min_val, max_val)
+                for min_val, max_val in self.search_space
+            ]
+            self.particles.append(
+                {
+                    'position': initial_position,
+                    'best_personal_position': initial_position,
+                    'best_personal_value': float('inf'),
+                }
+            )
+
+    def optimize(
+        self,
+        objective_function: BaseFunction,
+    ) -> None:
+        """
+        Optimize the given objective function using Bare Bones Particle Swarm
+        Optimization (PSO).
+
+        Args:
+            objective_function (BaseFunction): The objective function to be
+                optimized.
+        """
+        self.initialize_particles()
+
+        for i in range(self.max_iterations):
+            best_global_value: float = self.best_global_value
+            best_global_position: List[float] = self.best_global_position
+
+            for particle in self.particles:
+                # get particle data
+                best_personal_position: List[float] = cast(
+                    List[float], particle['best_personal_position']
+                )
+
+                # update particle position
+                new_pos = [
+                    random.gauss((pi + gi) / 2, abs(gi - pi))
+                    for pi, gi in zip(
+                        best_personal_position, best_global_position
+                    )
+                ]
+
+                # evaluate the objective function
+                fit = objective_function.evaluate(new_pos)
+
+                # update personal and global best
+                if fit < best_global_value:
+                    particle['best_personal_value'] = fit
+                    particle['best_personal_position'] = new_pos
+
+                    if fit < self.best_global_value:
+                        self.best_global_value = fit
+                        self.best_global_position = new_pos
+
+                particle['position'] = new_pos
+
+            print(
+                f'[{i + 1}] current min value: {self.best_global_value:.4f}',
+                end='\r',
+            )
+        print()

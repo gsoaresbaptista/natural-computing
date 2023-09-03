@@ -1,12 +1,12 @@
 from natural_computing.objective_functions import RastriginFunction
-from natural_computing.optimization import ParticleSwarmOptimization
+from natural_computing.optimization import BareBonesParticleSwarmOptimization
 
 if __name__ == '__main__':
     # Example of using the Particle Swarm Optimization class by
     # process of optimizing a rastrigin function.
-    rastrigin_function = RastriginFunction(3)
-    pso = ParticleSwarmOptimization(
-        100, 1000, 1, 2, 2, [(-8, 8), (-8, 8), (-8, 8)]
+    rastrigin_function = RastriginFunction(10)
+    pso = BareBonesParticleSwarmOptimization(
+        80, 10000, [(-10, 10) for _ in range(10)]
     )
     pso.optimize(rastrigin_function)
     print(
