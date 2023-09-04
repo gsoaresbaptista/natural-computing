@@ -1,7 +1,11 @@
+from typing import List
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
 from natural_computing.objective_functions import SquaredError
 from natural_computing.optimization import BareBonesParticleSwarmOptimization
-import pandas as pd
-from typing import List
+from natural_computing.plotting import polynomial_plot
 
 
 def read_txt(path: str) -> List[float]:
@@ -15,10 +19,8 @@ if __name__ == '__main__':
 
     objective_function = SquaredError(x_data, y_data, mean=True)
     pso = BareBonesParticleSwarmOptimization(
-        80, 3000, [(-5, 5) for _ in range(3)]
+        80, 300, [(-5, 5) for _ in range(3)]
     )
     pso.optimize(objective_function)
-    print(pso.best_global_position)
-    # print(
-    #     f'best position: {[round(p_i, 4) for p_i in pso.best_global_position]}'
-    # )
+    polynomial_plot(pso.best_global_position, (-5, 5), 100, x_data, y_data)
+    plt.show()

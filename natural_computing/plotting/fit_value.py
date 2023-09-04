@@ -1,3 +1,11 @@
+"""
+Fit Value Module
+    This module defines functions to plot fitness values.
+
+Methods:
+    best_mean_plot
+"""
+
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
