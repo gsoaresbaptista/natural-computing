@@ -11,10 +11,10 @@ import random
 from typing import Dict, List, Tuple, cast
 
 from natural_computing.objective_functions import BaseFunction
-from natural_computing.optimization import BaseOptimizer
+from natural_computing.optimization import PopulationBaseOptimizer
 
 
-class ParticleSwarmOptimization(BaseOptimizer):
+class ParticleSwarmOptimization(PopulationBaseOptimizer):
     """
     Particle Swarm Optimization (PSO) algorithm implementation.
 
@@ -42,8 +42,7 @@ class ParticleSwarmOptimization(BaseOptimizer):
     Methods:
         initialize_particles(): Initialize particles with random positions and
             velocities.
-        optimize(objective_function): Optimize the given objective function
-            using PSO.
+        _optimization_step(objective_function): Optimization step using PSO.
         update_velocity(velocity, current_position, best_personal_position,
             best_global_position): Update particle velocity using PSO
             equations.
@@ -60,15 +59,15 @@ class ParticleSwarmOptimization(BaseOptimizer):
         social_weight: float,
         search_space: List[Tuple[float, float]],
     ) -> None:
+        super().__init__(max_iterations)
         self.num_particles: int = num_particles
-        self.max_iterations: int = max_iterations
         self.inertia_weight: float = inertia_weight
         self.cognitive_weight: float = cognitive_weight
         self.social_weight: float = social_weight
         self.search_space: List[Tuple[float, float]] = search_space
         self.best_global_position: List[float] = [0.0 for _ in search_space]
-        self.best_global_value = float('inf')
         self.particles: List[Dict[str, float | List[float]]] = []
+        self.initialize_particles()
 
     def initialize_particles(self) -> None:
         """
@@ -92,63 +91,56 @@ class ParticleSwarmOptimization(BaseOptimizer):
                 }
             )
 
-    def optimize(
+    def _optimization_step(
         self,
         objective_function: BaseFunction,
-    ) -> None:
+    ) -> List[float]:
         """
-        Optimize the given objective function using Particle Swarm
-        Optimization (PSO).
+        Objective function optimization step provided using Particle Swarm
+            Optimization (PSO).
 
         Args:
             objective_function (BaseFunction): The objective function to be
                 optimized.
         """
-        self.initialize_particles()
+        fit_list: List[float] = []
 
-        for i in range(self.max_iterations):
-            best_global_value: float = self.best_global_value
-            best_global_position: List[float] = self.best_global_position
-
-            for particle in self.particles:
-                # get particle data
-                current_position: List[float] = cast(
-                    List[float], particle['position']
-                )
-                best_personal_position: List[float] = cast(
-                    List[float], particle['best_personal_position']
-                )
-                velocity: List[float] = cast(List[float], particle['velocity'])
-
-                # update particle velocity and position
-                new_vel = self.update_velocity(
-                    velocity,
-                    current_position,
-                    best_personal_position,
-                    best_global_position,
-                )
-                new_pos = self.update_position(current_position, new_vel)
-
-                # evaluate the objective function
-                fit = objective_function.evaluate(new_pos)
-
-                # update personal and global best
-                if fit < best_global_value:
-                    particle['best_personal_value'] = fit
-                    particle['best_personal_position'] = new_pos
-
-                    if fit < self.best_global_value:
-                        self.best_global_value = fit
-                        self.best_global_position = new_pos
-
-                particle['position'] = new_pos
-                particle['velocity'] = new_vel
-
-            print(
-                f'[{i + 1}] current min value: {self.best_global_value:.4f}',
-                end='\r',
+        for particle in self.particles:
+            # get particle data
+            current_position: List[float] = cast(
+                List[float], particle['position']
             )
-        print()
+            best_personal_position: List[float] = cast(
+                List[float], particle['best_personal_position']
+            )
+            velocity: List[float] = cast(List[float], particle['velocity'])
+
+            # update particle velocity and position
+            new_vel = self.update_velocity(
+                velocity,
+                current_position,
+                best_personal_position,
+                self.best_global_position,
+            )
+            new_pos = self.update_position(current_position, new_vel)
+
+            # evaluate the objective function
+            fit = objective_function.evaluate(new_pos)
+            fit_list.append(fit)
+
+            # update personal and global best
+            if fit < self.best_global_value:
+                particle['best_personal_value'] = fit
+                particle['best_personal_position'] = new_pos
+
+                if fit < self.best_global_value:
+                    self.best_global_value = fit
+                    self.best_global_position = new_pos
+
+            particle['position'] = new_pos
+            particle['velocity'] = new_vel
+
+        return fit_list
 
     def update_velocity(
         self,
@@ -211,7 +203,7 @@ class ParticleSwarmOptimization(BaseOptimizer):
         ]
 
 
-class BareBonesParticleSwarmOptimization(BaseOptimizer):
+class BareBonesParticleSwarmOptimization(PopulationBaseOptimizer):
     """
     BareBones Particle Swarm Optimization (BB-PSO) algorithm implementation.
 
@@ -235,8 +227,7 @@ class BareBonesParticleSwarmOptimization(BaseOptimizer):
     Methods:
         initialize_particles(): Initialize particles with random positions and
             velocities.
-        optimize(objective_function): Optimize the given objective function
-            using BB-PSO.
+        _optimization_step(objective_function): Optimization step using BB-PSO.
     """
 
     def __init__(
@@ -245,12 +236,12 @@ class BareBonesParticleSwarmOptimization(BaseOptimizer):
         max_iterations: int,
         search_space: List[Tuple[float, float]],
     ) -> None:
+        super().__init__(max_iterations)
         self.num_particles: int = num_particles
-        self.max_iterations: int = max_iterations
         self.search_space: List[Tuple[float, float]] = search_space
         self.best_global_position: List[float] = [0.0 for _ in search_space]
-        self.best_global_value = float('inf')
         self.particles: List[Dict[str, float | List[float]]] = []
+        self.initialize_particles()
 
     def initialize_particles(self) -> None:
         """
@@ -273,54 +264,47 @@ class BareBonesParticleSwarmOptimization(BaseOptimizer):
                 }
             )
 
-    def optimize(
+    def _optimization_step(
         self,
         objective_function: BaseFunction,
-    ) -> None:
+    ) -> List[float]:
         """
-        Optimize the given objective function using Bare Bones Particle Swarm
-        Optimization (PSO).
+        Objective function optimization step provided using Bare Bones
+            Particle Swarm Optimization (PSO)
 
         Args:
             objective_function (BaseFunction): The objective function to be
                 optimized.
         """
-        self.initialize_particles()
+        fit_values: List[float] = []
 
-        for i in range(self.max_iterations):
-            best_global_value: float = self.best_global_value
-            best_global_position: List[float] = self.best_global_position
-
-            for particle in self.particles:
-                # get particle data
-                best_personal_position: List[float] = cast(
-                    List[float], particle['best_personal_position']
-                )
-
-                # update particle position
-                new_pos = [
-                    random.gauss((pi + gi) / 2, abs(gi - pi))
-                    for pi, gi in zip(
-                        best_personal_position, best_global_position
-                    )
-                ]
-
-                # evaluate the objective function
-                fit = objective_function.evaluate(new_pos)
-
-                # update personal and global best
-                if fit < best_global_value:
-                    particle['best_personal_value'] = fit
-                    particle['best_personal_position'] = new_pos
-
-                    if fit < self.best_global_value:
-                        self.best_global_value = fit
-                        self.best_global_position = new_pos
-
-                particle['position'] = new_pos
-
-            print(
-                f'[{i + 1}] current min value: {self.best_global_value:.4f}',
-                end='\r',
+        for particle in self.particles:
+            # get particle data
+            best_personal_position: List[float] = cast(
+                List[float], particle['best_personal_position']
             )
-        print()
+
+            # update particle position
+            new_pos = [
+                random.gauss((pi + gi) / 2, abs(gi - pi))
+                for pi, gi in zip(
+                    best_personal_position, self.best_global_position
+                )
+            ]
+
+            # evaluate the objective function
+            fit = objective_function.evaluate(new_pos)
+            fit_values.append(fit)
+
+            # update personal and global best
+            if fit < self.best_global_value:
+                particle['best_personal_value'] = fit
+                particle['best_personal_position'] = new_pos
+
+                if fit < self.best_global_value:
+                    self.best_global_value = fit
+                    self.best_global_position = new_pos
+
+            particle['position'] = new_pos
+
+        return fit_values

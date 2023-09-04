@@ -4,9 +4,9 @@ from natural_computing.optimization import BareBonesParticleSwarmOptimization
 if __name__ == '__main__':
     # Example of using the Particle Swarm Optimization class by
     # process of optimizing a rastrigin function.
-    rastrigin_function = RastriginFunction(10)
+    rastrigin_function = RastriginFunction(5)
     pso = BareBonesParticleSwarmOptimization(
-        80, 10000, [(-10, 10) for _ in range(10)]
+        80, 10000, [(-5.12, 5.12) for _ in range(5)]
     )
     pso.optimize(rastrigin_function)
     print(
