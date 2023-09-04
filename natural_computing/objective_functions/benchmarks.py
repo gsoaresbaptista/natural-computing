@@ -32,6 +32,7 @@ class RastriginFunction(BaseFunction):
     """
 
     def __init__(self, dimension: int, factor: float = 1.0):
+        super().__init__(0.0)
         self.dimension = dimension
         self.factor = factor
 

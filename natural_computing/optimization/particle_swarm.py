@@ -114,6 +114,7 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
                 List[float], particle['best_personal_position']
             )
             velocity: List[float] = cast(List[float], particle['velocity'])
+            best_personal_value: float = particle['best_personal_value']
 
             # update particle velocity and position
             new_vel = self.update_velocity(
@@ -129,7 +130,7 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
             fit_list.append(fit)
 
             # update personal and global best
-            if fit < self.best_global_value:
+            if fit < best_personal_value:
                 particle['best_personal_value'] = fit
                 particle['best_personal_position'] = new_pos
 
@@ -283,6 +284,7 @@ class BareBonesParticleSwarmOptimization(PopulationBaseOptimizer):
             best_personal_position: List[float] = cast(
                 List[float], particle['best_personal_position']
             )
+            best_personal_value: float = particle['best_personal_value']
 
             # update particle position
             new_pos = [
@@ -297,7 +299,7 @@ class BareBonesParticleSwarmOptimization(PopulationBaseOptimizer):
             fit_values.append(fit)
 
             # update personal and global best
-            if fit < self.best_global_value:
+            if fit < best_personal_value:
                 particle['best_personal_value'] = fit
                 particle['best_personal_position'] = new_pos
 

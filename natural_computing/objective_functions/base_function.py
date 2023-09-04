@@ -18,6 +18,8 @@ class BaseFunction(ABC):
         evaluate(x): Abstract method to evaluate the function at the given
             point.
     """
+    def __init__(self, best_fit: float = None) -> None:
+        self.best_fit: float | None = best_fit
 
     @abstractmethod
     def evaluate(self, point: List[float]) -> float:
