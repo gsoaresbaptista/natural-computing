@@ -9,6 +9,7 @@ packages = [{include = "natural_computing"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 matplotlib = "^3.7.2"
+pandas = "^2.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
