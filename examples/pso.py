@@ -6,7 +6,7 @@ if __name__ == '__main__':
     # process of optimizing a rastrigin function.
     rastrigin_function = RastriginFunction(5)
     pso = BareBonesParticleSwarmOptimization(
-        80, 10000, [(-5.12, 5.12) for _ in range(5)]
+        80, 1000, [(-5.12, 5.12) for _ in range(5)]
     )
     pso.optimize(rastrigin_function)
     print(

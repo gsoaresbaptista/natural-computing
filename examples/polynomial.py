@@ -7,8 +7,9 @@ from natural_computing.plotting import polynomial_plot
 
 if __name__ == '__main__':
     # Example of using optimizers to find polynomial coefficients.
-    x_data = np.linspace(-5, 5, 30).tolist()
+    x_data = np.linspace(-5, 5, 30)
     y_data = (2 * x_data**2 - 3 * x_data + 1).tolist()
+    x_data = x_data.tolist()
 
     objective_function = SquaredError(x_data, y_data, mean=True)
     pso = BareBonesParticleSwarmOptimization(
