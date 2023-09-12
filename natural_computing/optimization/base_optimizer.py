@@ -60,10 +60,10 @@ class PopulationBaseOptimizer(ABC):
     """
 
     def __init__(
-            self,
-            max_iterations: int,
-            population_size: int,
-            search_space: List[Tuple[float, float]],
+        self,
+        max_iterations: int,
+        population_size: int,
+        search_space: List[Tuple[float, float]],
     ) -> None:
         self.max_iterations: int = max_iterations
         self.population_size = population_size

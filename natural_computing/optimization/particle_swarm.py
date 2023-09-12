@@ -5,6 +5,9 @@ Particle Swarm Optimization
 Classes:
     ParticleSwarmOptimization: The implementation of the Particle Swarm
         Optimization algorithm.
+
+    BareBonesParticleSwarmOptimization: The implementation of the Bare Bones
+        Particle Swarm Optimization algorithm version.
 """
 
 import random
@@ -42,11 +45,14 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
     Methods:
         initialize_particles(): Initialize particles with random positions and
             velocities.
+
         _optimization_step(objective_function): Optimization step using PSO.
-        update_velocity(velocity, current_position, best_personal_position,
+
+        _update_velocity(velocity, current_position, best_personal_position,
             best_global_position): Update particle velocity using PSO
             equations.
-        update_position(current_position, velocity): Update particle position
+
+        _update_position(current_position, velocity): Update particle position
             based on velocity.
     """
 
@@ -112,16 +118,18 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
                 List[float], particle['best_personal_position']
             )
             velocity: List[float] = cast(List[float], particle['velocity'])
-            best_personal_value: float = particle['best_personal_value']
+            best_personal_value: float = cast(
+                float, particle['best_personal_value']
+            )
 
             # update particle velocity and position
-            new_vel = self.update_velocity(
+            new_vel = self._update_velocity(
                 velocity,
                 current_position,
                 best_personal_position,
                 self.best_global_position,
             )
-            new_pos = self.update_position(current_position, new_vel)
+            new_pos = self._update_position(current_position, new_vel)
 
             # evaluate the objective function
             fit = objective_function.evaluate(new_pos)
@@ -226,6 +234,7 @@ class BareBonesParticleSwarmOptimization(PopulationBaseOptimizer):
     Methods:
         initialize_particles(): Initialize particles with random positions and
             velocities.
+
         _optimization_step(objective_function): Optimization step using BB-PSO.
     """
 
