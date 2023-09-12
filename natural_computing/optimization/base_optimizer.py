@@ -7,7 +7,7 @@ Classes:
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from natural_computing.objective_functions import BaseFunction
 
@@ -42,19 +42,32 @@ class PopulationBaseOptimizer(ABC):
 
     Args:
         max_iterations (int): The maximum number of optimization iterations.
+        population_size (int): The size of the algorithm population.
+        search_space (list of tuples): The search space for initial particle
+            positions.
 
     Attributes:
         history (Dict[str, list]): Dict with the record of the best and the
             average of the values of the solution solutions by the solver.
         max_iterations (int): The maximum number of optimization iterations.
+        population_size (int): The size of the algorithm population.
+        search_space (list of tuples): The search space for initial particle
+            positions.
 
     Methods:
         optimize(objective_function): Abstract method to optimize using the
             given objective function.
     """
 
-    def __init__(self, max_iterations: int) -> None:
+    def __init__(
+            self,
+            max_iterations: int,
+            population_size: int,
+            search_space: List[Tuple[float, float]],
+    ) -> None:
         self.max_iterations: int = max_iterations
+        self.population_size = population_size
+        self.search_space = search_space
         self.best_global_value: float = float('inf')
         self.history: Dict[str, List[float]] = {
             'best': [],

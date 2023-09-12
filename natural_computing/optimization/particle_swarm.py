@@ -59,12 +59,10 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
         social_weight: float,
         search_space: List[Tuple[float, float]],
     ) -> None:
-        super().__init__(max_iterations)
-        self.num_particles: int = num_particles
+        super().__init__(max_iterations, num_particles, search_space)
         self.inertia_weight: float = inertia_weight
         self.cognitive_weight: float = cognitive_weight
         self.social_weight: float = social_weight
-        self.search_space: List[Tuple[float, float]] = search_space
         self.best_global_position: List[float] = [0.0 for _ in search_space]
         self.particles: List[Dict[str, float | List[float]]] = []
         self.initialize_particles()
@@ -77,7 +75,7 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
         self.particles.clear()
 
         # generate each particle
-        for _ in range(self.num_particles):
+        for _ in range(self.population_size):
             initial_position = [
                 random.uniform(min_val, max_val)
                 for min_val, max_val in self.search_space
@@ -237,9 +235,7 @@ class BareBonesParticleSwarmOptimization(PopulationBaseOptimizer):
         max_iterations: int,
         search_space: List[Tuple[float, float]],
     ) -> None:
-        super().__init__(max_iterations)
-        self.num_particles: int = num_particles
-        self.search_space: List[Tuple[float, float]] = search_space
+        super().__init__(max_iterations, num_particles, search_space)
         self.best_global_position: List[float] = [0.0 for _ in search_space]
         self.particles: List[Dict[str, float | List[float]]] = []
         self.initialize_particles()
@@ -252,7 +248,7 @@ class BareBonesParticleSwarmOptimization(PopulationBaseOptimizer):
         self.particles.clear()
 
         # generate each particle
-        for _ in range(self.num_particles):
+        for _ in range(self.population_size):
             initial_position = [
                 random.uniform(min_val, max_val)
                 for min_val, max_val in self.search_space
