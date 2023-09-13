@@ -1,7 +1,9 @@
 from .base_optimizer import BaseOptimizer, PopulationBaseOptimizer
-from .genetic_algorithm import BinaryGeneticAlgorithm
-from .particle_swarm import (BareBonesParticleSwarmOptimization,
-                             ParticleSwarmOptimization)
+from .genetic_algorithm import BinaryGeneticAlgorithm, RealGeneticAlgorithm
+from .particle_swarm import (
+    BareBonesParticleSwarmOptimization,
+    ParticleSwarmOptimization,
+)
 
 __all__ = [
     'BaseOptimizer',
@@ -9,4 +11,5 @@ __all__ = [
     'ParticleSwarmOptimization',
     'BareBonesParticleSwarmOptimization',
     'BinaryGeneticAlgorithm',
+    'RealGeneticAlgorithm',
 ]
