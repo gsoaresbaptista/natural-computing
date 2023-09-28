@@ -14,11 +14,9 @@ import random
 from typing import List, Tuple
 
 from natural_computing.objective_functions import BaseFunction
-from natural_computing.utils import (
-    binary_ieee754_to_float,
-    float_to_binary_ieee754,
-    inverse_binary,
-)
+from natural_computing.utils import (binary_ieee754_to_float,
+                                     bounded_random_vectors,
+                                     float_to_binary_ieee754, inverse_binary)
 
 from .base_optimizer import PopulationBaseOptimizer
 
@@ -120,10 +118,8 @@ class BinaryGeneticAlgorithm(PopulationBaseOptimizer):
         # generate the first half of the individuals
         for _ in range(self.population_size // 2):
             genome = [
-                float_to_binary_ieee754(
-                    random.random() * (max_val - min_val) + min_val
-                )
-                for min_val, max_val in self.search_space
+                float_to_binary_ieee754(value)
+                for value in bounded_random_vectors(self.search_space)
             ]
             self.population.append(genome)
 
@@ -365,12 +361,7 @@ class RealGeneticAlgorithm(PopulationBaseOptimizer):
         self.population.clear()
 
         for _ in range(self.population_size):
-            self.population.append(
-                [
-                    random.random() * (max_val - min_val) + min_val
-                    for min_val, max_val in self.search_space
-                ]
-            )
+            self.population.append(bounded_random_vectors(self.search_space))
 
     def _fit_population(self, objective_function: BaseFunction) -> None:
         """

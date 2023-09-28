@@ -10,7 +10,8 @@ import random
 from typing import List, Tuple
 
 from natural_computing.objective_functions import BaseFunction
-from natural_computing.utils import mul_list, sub_lists, sum_lists
+from natural_computing.utils import (bounded_random_vectors, mul_list,
+                                     sub_lists, sum_lists)
 
 from .base_optimizer import PopulationBaseOptimizer
 
@@ -52,12 +53,7 @@ class DifferentialEvolution(PopulationBaseOptimizer):
         self.population.clear()
 
         for _ in range(self.population_size):
-            self.population.append(
-                [
-                    random.random() * (max_val - min_val) + min_val
-                    for min_val, max_val in self.search_space
-                ]
-            )
+            self.population.append(bounded_random_vectors(self.search_space))
 
     def _optimization_step(
         self, objective_function: BaseFunction

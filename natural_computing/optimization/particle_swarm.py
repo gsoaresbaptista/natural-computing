@@ -15,6 +15,7 @@ from typing import Dict, List, Tuple, cast
 
 from natural_computing.objective_functions import BaseFunction
 from natural_computing.optimization import PopulationBaseOptimizer
+from natural_computing.utils import bounded_random_vectors
 
 
 class ParticleSwarmOptimization(PopulationBaseOptimizer):
@@ -82,13 +83,10 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
 
         # generate each particle
         for _ in range(self.population_size):
-            initial_position = [
-                random.uniform(min_val, max_val)
-                for min_val, max_val in self.search_space
-            ]
+            initial_position = bounded_random_vectors(self.search_space)
             self.particles.append(
                 {
-                    'position': initial_position,
+                    'position': bounded_random_vectors(self.search_space),
                     'velocity': [0.0] * len(self.search_space),
                     'best_personal_position': initial_position,
                     'best_personal_value': float('inf'),
@@ -258,10 +256,7 @@ class BareBonesParticleSwarmOptimization(PopulationBaseOptimizer):
 
         # generate each particle
         for _ in range(self.population_size):
-            initial_position = [
-                random.uniform(min_val, max_val)
-                for min_val, max_val in self.search_space
-            ]
+            initial_position = bounded_random_vectors(self.search_space)
             self.particles.append(
                 {
                     'position': initial_position,

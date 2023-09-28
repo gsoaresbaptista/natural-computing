@@ -48,7 +48,7 @@ def binary_ieee754_to_float(binary_string: str) -> float:
             representation.
     """
     bytes_list = [
-        binary_string[i: i + 8] for i in range(0, len(binary_string), 8)
+        binary_string[i : i + 8] for i in range(0, len(binary_string), 8)
     ]
     byte_sequence = bytes([int(byte, 2) for byte in bytes_list])
     (float_number,) = cast(float, struct.unpack('>f', byte_sequence))
