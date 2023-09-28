@@ -5,10 +5,8 @@ activation_functions.py - Activation functions for  simple neural networks
     neural networks.
 
 Functions:
-    sigmoid(x: np.array, derivative: bool = False) -> np.array:
-        Passes the vector through the sigmoid function. If the derivative
-        value is true, pass the value through the derivative of the sigmoid
-        function.
+    sigmoid(x: np.array, derivative: bool = False) -> np.array
+    softmax(x: np.array, derivative: bool = False) -> np.array
 """
 
 import numpy as np
