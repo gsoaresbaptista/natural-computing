@@ -14,9 +14,12 @@ import random
 from typing import List, Tuple
 
 from natural_computing.objective_functions import BaseFunction
-from natural_computing.utils import (binary_ieee754_to_float,
-                                     bounded_random_vectors,
-                                     float_to_binary_ieee754, inverse_binary)
+from natural_computing.utils import (
+    binary_ieee754_to_float,
+    bounded_random_vectors,
+    float_to_binary_ieee754,
+    inverse_binary,
+)
 
 from .base_optimizer import PopulationBaseOptimizer
 

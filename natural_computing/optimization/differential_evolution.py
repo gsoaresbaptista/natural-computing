@@ -10,8 +10,12 @@ import random
 from typing import List, Tuple
 
 from natural_computing.objective_functions import BaseFunction
-from natural_computing.utils import (bounded_random_vectors, mul_list,
-                                     sub_lists, sum_lists)
+from natural_computing.utils import (
+    bounded_random_vectors,
+    mul_list,
+    sub_lists,
+    sum_lists,
+)
 
 from .base_optimizer import PopulationBaseOptimizer
 
@@ -69,7 +73,7 @@ class DifferentialEvolution(PopulationBaseOptimizer):
             List[float]: List of fitness values for the population.
         """
         fits = []
-        population_m: List[float] = []
+        population_m: List[List[float]] = []
 
         for _ in range(self.population_size):
             # randomly select three distinct indices
