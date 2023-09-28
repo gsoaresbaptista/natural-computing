@@ -51,6 +51,6 @@ def softmax(x: np.array, derivative: bool = False) -> np.array:
     result = e_x / sum_e_x
 
     if derivative:
-        result *= (1 - result)
+        result *= 1 - result
 
     return result
