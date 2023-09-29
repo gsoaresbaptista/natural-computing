@@ -8,94 +8,161 @@ Classes:
     MultiLayerPerceptron: Implementation of a Multi-Layer Perceptron.
 """
 
-from typing import List
+from typing import Callable, List
+from itertools import zip_longest
 
 import numpy as np
 
-from .activation_functions import sigmoid, softmax
+from .activation_functions import linear
+from .loss_functions import mse
 
 
-class MultiLayerPerceptron:
+class Dense:
+    """
+    Initialize a Dense layer for a neural network.
+
+    Args:
+        input_size (int): Number of input neurons.
+        output_size (int): Number of output neurons.
+        activation (Callable, optional): Activation function to be used in the
+            layer (defaults to the linear activation function).
+
+    Returns:
+        None
+    """
     def __init__(
         self,
         input_size: int,
-        hidden_sizes: List[int],
         output_size: int,
+        activation: Callable[[np.array, bool], np.array] = linear,
+    ) -> None:
+        self._input = None
+        self._weights = np.random.randn(output_size, input_size)
+        self._biases = np.random.randn(1, output_size)
+        self._activation = activation
+        # intermediary values
+        self._activation_input, self._activation_output = None, None
+        self._dweights, self._dbiases = None, None
+
+
+class NeuralNetwork:
+    def __init__(
+        self,
+        learning_rate: float,
+        loss_function: Callable[[np.array, np.array], np.array] = mse,
     ) -> None:
         """
-        Initialize a MultiLayerPerceptron.
+        Initialize a neural network.
 
         Args:
-            input_size (int): The size of the input layer.
-            hidden_sizes (List[int]): List of integers representing the sizes
-                of hidden layers.
-            output_size (int): The size of the output layer.
-        """
-        self._input_size = input_size
-        self._output_size = output_size
-        self._layers: List[np.array] = []
-        self._architecture_create(hidden_sizes)
-        # dict to save intermediate values
-        self._state = {}
-
-    def _architecture_create(self, hidden: List[int]) -> None:
-        """
-        Create the architecture of the MultiLayerPerceptron.
-
-        Args:
-            hidden (List[int]): List of integers representing the sizes of
-                hidden layers.
-        """
-        # add the input layer
-        self._layers.append(
-            np.random.randn(hidden[0], self._input_size)
-            * np.sqrt(1.0 / hidden[0])
-        )
-
-        # create network structure
-        for i in range(1, len(hidden)):
-            self._layers.append(
-                np.random.randn(hidden[i], hidden[i - 1])
-                * np.sqrt(1.0 / hidden[i])
-            )
-
-        # add the output layer
-        self._layers.append(
-            np.random.randn(self._output_size, hidden[-1])
-            * np.sqrt(1.0 / hidden[0])
-        )
-
-    def forward(self, x: np.array) -> np.array:
-        """
-        Perform forward propagation through the Multi-Layer Perceptron.
-
-        Forward propagation computes the output of the MLP given an input. The
-        input data is passed through the network's layers, and the final
-        output is returned.
-
-        Args:
-            x (np.array): Input data as a NumPy array.
+            learning_rate (float): Learning rate for training.
+            loss_function (Callable, optional): Loss function used for
+                training (defaults to the mean squared error (MSE)).
 
         Returns:
-            np.array: The output of the MLP after forward propagation.
+            None
         """
-        self._state.clear()
+        self._layers: List[Dense] = []
+        self._learning_rate = learning_rate
+        self._loss_function = loss_function
 
-        # input layer
-        self._state['o0'] = x
+    def fit(
+        self,
+        x_train: np.array,
+        y_train: np.array,
+        epochs: int = 100,
+        verbose: int = 10,
+    ) -> None:
+        """
+        Train the neural network.
 
-        # hidden layers
-        for i in range(1, len(self._layers)):
-            self._state[f'z{i}'] = np.dot(
-                self._state[f'o{i - 1}'], self._layers[i - 1].T,
+        Args:
+            x_train (np.array): Input training data.
+            y_train (np.array): Target training data.
+            epochs (int, optional): Number of training epochs
+                (defaults to 100).
+            verbose (int, optional): Frequency of progress updates
+                (defaults to 10).
+
+        Returns:
+            None
+        """
+        for epoch in range(epochs):
+            y_pred = self.__feedforward(x_train)
+            self.__backpropagation(y_train, y_pred)
+
+            if (epoch + 1) % verbose == 0:
+                y_pred = self.predict(x_train)
+                loss_train = self._loss_function(y_train, y_pred)
+                print(
+                    f'epoch: {epoch + 1:3}/{epochs:3} | '
+                    f'loss train: {loss_train:.8f}'
+                )
+
+    def predict(self, x: np.array) -> np.array:
+        """
+        Make predictions using the trained neural network.
+
+        Args:
+            x (np.array): Input data.
+
+        Returns:
+            np.array: Predicted output.
+        """
+        return self.__feedforward(x)
+
+    def __feedforward(self, x: np.array) -> np.array:
+        """
+        Perform the feedforward pass of the neural network.
+
+        Args:
+            x (np.array): Input data.
+
+        Returns:
+            np.array: Predicted output.
+        """
+        self._layers[0]._input = x
+        layer_pairs = zip_longest(self._layers, self._layers[1:])
+
+        # process each layer
+        for cur_layer, next_layer in layer_pairs:
+            y = cur_layer._input.dot(cur_layer._weights.T) + cur_layer._biases
+
+            # save values
+            cur_layer._activation_input = y
+            cur_layer._activation_output = cur_layer._activation(y)
+
+            if next_layer:
+                next_layer._input = cur_layer._activation_output
+
+        return self._layers[-1]._activation_output
+
+    def __backpropagation(self, y: np.array, y_pred: np.array) -> None:
+        """
+        Perform the backpropagation algorithm to update weights and biases.
+
+        Args:
+            y (np.array): Target values.
+            y_pred (np.array): Predicted values.
+
+        Returns:
+            None
+        """
+        last_delta = self._loss_function(y, y_pred, derivative=True)
+
+        # calculate in reverse
+        for layer in reversed(self._layers):
+            dactivation = (
+                layer._activation(layer._activation_input, derivative=True)
+                * last_delta
             )
-            self._state[f'o{i}'] = sigmoid(self._state[f'z{i}'])
+            last_delta = dactivation.dot(layer._weights)
+            layer._dweights = dactivation.T.dot(layer._input)
+            layer._dbias = 1.0 * dactivation.sum(axis=0, keepdims=True)
 
-        # output layer
-        ll = len(self._layers)
-        self._state[f'z{ll}'] = np.dot(
-            self._state[f'o{ll - 1}'], self._layers[ll - 1].T
-        )
-        self._state[f'o{ll}'] = softmax(self._state[f'z{ll}'])
-
-        return self._state[f'o{ll}']
+        # update weights and biases
+        for layer in reversed(self._layers):
+            layer._weights = (
+                layer._weights - self._learning_rate * layer._dweights
+            )
+            layer._biases = layer._biases - self._learning_rate * layer._dbias

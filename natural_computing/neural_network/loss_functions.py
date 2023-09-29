@@ -34,8 +34,8 @@ def softmax(x: np.array, derivative: bool = False) -> np.array:
 
 
 def neg_log_likelihood(
-    x: np.array,
     y: np.array,
+    y_pred: np.array,
     derivative: bool = False,
 ) -> np.array:
     """
@@ -43,8 +43,8 @@ def neg_log_likelihood(
     values.
 
     Args:
-        x (np.array): Predicted values.
         y (np.array): True values.
+        y_pred (np.array): Predicted values.
         derivative (bool, optional): Indicates whether you want to compute the
             derivative (default is False).
 
@@ -52,19 +52,19 @@ def neg_log_likelihood(
         np.array: Negative log-likelihood loss or its derivative if derivative
             is True.
     """
-    indices = np.nonzero(y * x)
-    values = x[indices]
+    indices = np.nonzero(y_pred * y)
+    values = y_pred[indices]
 
     if derivative:
-        y[indices] = -1.0 / values
-        return y
+        y_pred[indices] = -1.0 / values
+        return y_pred
 
     return np.mean(-np.log(values))
 
 
 def softmax_neg_likelihood(
-    x: np.array,
     y: np.array,
+    y_pred: np.array,
     derivative: bool = False,
 ) -> np.array:
     """
@@ -72,8 +72,8 @@ def softmax_neg_likelihood(
     true values.
 
     Args:
-        x (np.array): Predicted values.
         y (np.array): True values.
+        y_pred (np.array): Predicted values.
         derivative (bool, optional): Indicates whether you want to compute the
             derivative. Defaults to False.
 
@@ -81,13 +81,45 @@ def softmax_neg_likelihood(
         np.array: Softmax negative log-likelihood loss or its derivative if
         derivative is True.
     """
-    out = softmax(x)
+    out = softmax(y_pred)
 
     if derivative:
-        indices = np.nonzero(y * x)
-        dl = neg_log_likelihood(x, out, True)
-        ds = softmax(x, True)
-        out[indices] = dl[indices] * ds[indices]
-        return out / out.shape[0]
+        return -(y - out) / y.shape[0]
 
-    return neg_log_likelihood(out, y)
+    return neg_log_likelihood(y, out)
+
+
+def mae(y: np.array, y_pred: np.array, derivative=False) -> np.array:
+    """
+    Calculate the Mean Absolute Error (MAE) between predicted and true values.
+
+    Args:
+        y (np.array): True values.
+        y_pred (np.array): Predicted values.
+        derivative (bool, optional): Indicates whether you want to compute the
+            derivative (defaults to True).
+
+    Returns:
+        np.array: MAE or its derivative if derivative is True.
+    """
+    if derivative:
+        return np.where(y_pred > y, 1, -1) / y.shape[0]
+    return np.mean(np.abs(y - y_pred))
+
+
+def mse(y: np.array, y_pred: np.array, derivative=False) -> np.array:
+    """
+    Calculate the Mean Squared Error (MSE) between predicted and true values.
+
+    Args:
+        y (np.array): True values.
+        y_pred (np.array): Predicted values.
+        derivative (bool, optional): Indicates whether you want to compute the
+            derivative (defaults to True).
+
+    Returns:
+        np.array: MSE or its derivative if derivative is True.
+    """
+    if derivative:
+        return (y_pred - y) / y.shape[0]
+    return 0.5 * np.mean((y - y_pred) ** 2)

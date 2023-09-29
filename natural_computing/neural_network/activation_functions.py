@@ -23,3 +23,37 @@ def sigmoid(x: np.array, derivative: bool = False) -> np.array:
     """
     sigma = 1 / (1.0 + np.exp(-x))
     return sigma * (1 - sigma) if derivative else sigma
+
+
+def linear(x: np.array, derivative: bool = False) -> np.array:
+    """
+    Apply the linear function to an input array.
+
+    Args:
+        x (np.array): Input array.
+        derivative (bool, optional): Indicates whether you want to compute the
+            derivative (defaults to False).
+
+    Returns:
+        np.array: Output array after applying the linear function or its
+            derivative if derivative is True.
+    """
+    return np.ones_like(x) if derivative else x
+
+
+def relu(x: np.array, derivative: bool = False) -> np.array:
+    """
+    Apply the Rectified Linear Unit (ReLU) function to an input array.
+
+    Args:
+        x (np.array): Input array.
+        derivative (bool, optional): Indicates whether you want to compute the
+            derivative (defaults to False).
+
+    Returns:
+        np.array: Output array after applying the ReLU function or its
+            derivative if derivative is True.
+    """
+    if derivative:
+        return np.where(x <= 0, 0, 1)
+    return np.maximum(0, x)
