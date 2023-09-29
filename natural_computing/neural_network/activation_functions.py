@@ -25,10 +25,8 @@ def sigmoid(x: np.array, derivative: bool = False) -> np.array:
     Returns:
         np.array of values ​​passed by the sigmoid function.
     """
-    if derivative:
-        return np.exp(-x) / (np.exp(-x) + 1) ** 2
-    else:
-        return 1 / (1 + np.exp(-x))
+    sigma = 1 / (1.0 + np.exp(-x))
+    return sigma * (1 - sigma) if derivative else sigma
 
 
 def softmax(x: np.array, derivative: bool = False) -> np.array:
@@ -46,7 +44,7 @@ def softmax(x: np.array, derivative: bool = False) -> np.array:
         np.array: Output vector after applying the softmax function.
     """
     e_x = np.exp(x - np.max(x))
-    sum_e_x = e_x.sum(axis=0)
+    sum_e_x = e_x.sum(axis=1, keepdims=True)
 
     result = e_x / sum_e_x
 
