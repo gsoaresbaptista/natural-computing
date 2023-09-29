@@ -86,7 +86,7 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
             initial_position = bounded_random_vectors(self.search_space)
             self.particles.append(
                 {
-                    'position': bounded_random_vectors(self.search_space),
+                    'position': initial_position,
                     'velocity': [0.0] * len(self.search_space),
                     'best_personal_position': initial_position,
                     'best_personal_value': float('inf'),
