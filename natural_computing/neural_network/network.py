@@ -78,9 +78,7 @@ class MultiLayerPerceptron:
 
         Returns:
             np.array: The output of the MLP after forward propagation.
-
-        ```
-    """
+        """
         self._state.clear()
 
         # input layer
