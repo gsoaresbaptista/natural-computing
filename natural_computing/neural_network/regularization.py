@@ -7,6 +7,8 @@ Regularization Module
 
 import numpy as np
 
+from .layers import Dense
+
 
 def l1_regularization(weights: np.array, derivative: bool = False) -> np.array:
     """
@@ -117,3 +119,73 @@ def learning_rate_staircase_decay(
         float: Updated learning rate with staircase decay.
     """
     return learning_rate * decay_rate ** (epoch // decay_steps)
+
+
+def batch_normalization_forward(
+    layer: Dense, x: np.array, training: bool = True
+):
+    """
+    Perform batch normalization forward pass.
+
+    Args:
+        layer (Dense): The dense layer with batch normalization.
+
+        x (np.array): Input data.
+
+        training (bool, optional): Flag indicating if it's during training
+            (defaults to True).
+
+    Returns:
+        np.array: Output data after batch normalization.
+    """
+    mu = np.mean(x, axis=0) if training else layer._population_mean
+    var = np.var(x, axis=0) if training else layer._population_var
+    x_norm = (x - mu) / np.sqrt(var + 1e-8)
+    out = layer._gamma * x_norm + layer._beta
+
+    if training:
+        # mean average
+        layer._population_mean = (
+            layer._batch_decay * layer._population_mean
+            + (1 - layer._batch_decay) * mu
+        )
+        # mean var
+        layer._population_var = (
+            layer._batch_decay * layer._population_var
+            + (1 - layer._batch_decay) * var
+        )
+        # update batch norm cache
+        layer._batch_norm_cache = (x, x_norm, mu, var)
+
+    return out
+
+
+def batch_normalization_backward(
+    layer: Dense, dactivation: np.array
+) -> np.array:
+    """
+    Perform batch normalization backward pass.
+
+    Args:
+        layer (Dense): The dense layer with batch normalization.
+
+        dactivation (np.array): Gradient of the activation.
+
+    Returns:
+        np.array: Gradient with respect to the input data.
+    """
+    # extract cached values from the layer, and batch size from input
+    x, x_norm, mu, var = layer._batch_norm_cache
+    m = layer._activation_input.shape[0]
+
+    # compute gradients
+    x_mu = x - mu
+    std_inv = 1.0 / np.sqrt(var + 1e-8)
+    dx_norm = dactivation * layer._gamma
+    dvar = np.sum(dx_norm * x_mu, axis=0) * -0.5 * (std_inv**3)
+    dmu = np.sum(dx_norm * -std_inv, axis=0) + dvar * np.sum(-2 * x_mu, axis=0)
+    dx = (dx_norm * std_inv) + (dvar * 2 * x_mu / m) + (dmu / m)
+    layer._dgamma = np.sum(dactivation * x_norm, axis=0)
+    layer._dbeta = np.sum(dactivation, axis=0)
+
+    return dx

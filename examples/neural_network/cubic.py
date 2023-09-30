@@ -1,13 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from natural_computing.utils import make_cubic
+from natural_computing.utils import make_cubic, LayerFactory
 from natural_computing.neural_network import (
-    Dense,
     NeuralNetwork,
-    linear,
     mse,
-    tanh,
 )
 
 
@@ -24,11 +21,12 @@ if __name__ == '__main__':
     indices = np.random.randint(0, x.shape[0], x.shape[0])
     x_shuffled, y_shuffled = x_std[indices], y[indices]
     reg = {'regularization_strength': 0.001}
+    factory = LayerFactory()
 
     nn = NeuralNetwork(learning_rate=1e-3, loss_function=mse, momentum=0.9)
-    nn._layers.append(Dense(input_dim, 10, activation=tanh, **reg))
-    nn._layers.append(Dense(10, 10, activation=tanh, **reg))
-    nn._layers.append(Dense(10, output_dim, activation=linear, **reg))
+    nn._layers.append(factory.dense_layer(input_dim, 10, 'relu', **reg))
+    nn._layers.append(factory.dense_layer(10, 10, 'relu', **reg))
+    nn._layers.append(factory.dense_layer(10, output_dim, 'linear', **reg))
 
     nn.fit(x_shuffled, y_shuffled, epochs=5000, batch_size=320, verbose=500)
 

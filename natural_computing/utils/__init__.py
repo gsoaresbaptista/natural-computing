@@ -16,6 +16,7 @@ from .math import (
     sum_lists,
     zeros_initializer,
 )
+from .factories import LayerFactory
 
 __all__ = [
     'sum_lists',
@@ -32,4 +33,5 @@ __all__ = [
     'random_uniform_initializer',
     'glorot_uniform_initializer',
     'glorot_normal_initializer',
+    'LayerFactory',
 ]

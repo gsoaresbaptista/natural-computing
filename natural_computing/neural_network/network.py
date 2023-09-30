@@ -3,10 +3,6 @@ Neural Network Module
 
     This module implements a Multi-Layer Perceptron with backpropagation for
     weight optimization.
-
-Classes:
-    Dense: Implementation of a fully-connected layer.
-    NeuralNetwork: Implementation of a Multi-Layer Perceptron.
 """
 
 from copy import deepcopy
@@ -15,78 +11,19 @@ from typing import Callable, Iterable, List, Tuple, Union
 
 import numpy as np
 
-from natural_computing.utils import (
-    glorot_normal_initializer,
-    zeros_initializer,
-)
-
-from .activation_functions import linear
+from .layers import Dense
 from .loss_functions import mse
-from .regularization import l2_regularization, learning_rate_no_decay
+from .regularization import (
+    batch_normalization_backward,
+    batch_normalization_forward,
+    learning_rate_no_decay,
+)
 from .utils import batch_sequential
 
 # type hinting for functions
 loss_fn = Callable[[np.array, np.array], np.array]
 lr_decay_fn = Callable[[float, int, float, int], int]
-weight_generator_fn = Callable[[int, int], np.array]
-regularization_fn = Callable[[np.array, bool], np.array]
 batch_generator_fn = Iterable[Tuple[np.array, np.array]]
-
-
-class Dense:
-    def __init__(
-        self,
-        input_size: int,
-        output_size: int,
-        activation: Callable[[np.array, bool], np.array] = linear,
-        weights_initializer: weight_generator_fn = glorot_normal_initializer,
-        biases_initializer: weight_generator_fn = zeros_initializer,
-        regularization: regularization_fn = l2_regularization,
-        regularization_strength: float = 0.0,
-        dropout_probability: float = 0.0,
-    ) -> None:
-        """
-        Implementation of a fully-connected layer.
-
-        Args:
-            input_size (int): Number of input neurons.
-
-            output_size (int): Number of output neurons.
-
-            activation (Callable[[np.array, bool], np.array], optional):
-                Activation function to be used in the layer
-                (defaults to linear).
-
-            weights_initializer (weight_generator_fn, optional):
-                Weight initialization function (defaults to glorot normal
-                initializer).
-
-            biases_initializer (weight_generator_fn, optional):
-                Biases initialization function. Defaults to zeros_initializer.
-
-            regularization (regularization_fn, optional):
-                Regularization function to apply to the weights (defaults to
-                l2_regularization).
-
-            regularization_strength (float, optional):
-                Strength of the regularization term (defaults to 0.0).
-
-            dropout_probability (float, optional):
-                Dropout probability for regularization (defaults to 0.0).
-        """
-        self._input = None
-        self._weights = weights_initializer(output_size, input_size)
-        self._biases = biases_initializer(1, output_size)
-        self._activation = activation
-        self._regularization = regularization
-        self._regularization_strength = regularization_strength
-        self._dropout_probability = dropout_probability
-
-        # intermediary values
-        self._dropout_mask = None
-        self._activation_input, self._activation_output = None, None
-        self._dweights, self._dbiases = None, None
-        self._prev_dweights = 0.0
 
 
 class NeuralNetwork:
@@ -284,6 +221,10 @@ class NeuralNetwork:
         for cur_layer, next_layer in layer_pairs:
             y = cur_layer._input.dot(cur_layer._weights.T) + cur_layer._biases
 
+            # apply batch normalization
+            if cur_layer._batch_norm:
+                y = batch_normalization_forward(cur_layer, y, training)
+
             # dropout mask
             cur_layer._dropout_mask = np.random.binomial(
                 1, 1.0 - cur_layer._dropout_probability, y.shape
@@ -320,6 +261,11 @@ class NeuralNetwork:
                 * last_delta
                 * layer._dropout_mask
             )
+
+            # compute derivation for batch normalization
+            if layer._batch_norm:
+                dactivation = batch_normalization_backward(layer, dactivation)
+
             last_delta = dactivation.dot(layer._weights)
             layer._dweights = dactivation.T.dot(layer._input)
             layer._dbias = 1.0 * dactivation.sum(axis=0, keepdims=True)
@@ -341,3 +287,10 @@ class NeuralNetwork:
             # update weights and biases
             layer._weights = layer._weights + layer._prev_dweights
             layer._biases = layer._biases - self._learning_rate * layer._dbias
+
+            # update batch normalization
+            if layer._batch_norm:
+                layer._beta = layer._beta - self._learning_rate * layer._dbeta
+                layer._gamma = (
+                    layer._gamma - self._learning_rate * layer._dgamma
+                )
