@@ -118,7 +118,7 @@ def zeros_initializer(rows: int, cols: int) -> np.array:
     Returns:
         np.array: Weight matrix filled with zeros.
     """
-    return np.zero((rows, cols))
+    return np.zeros((rows, cols))
 
 
 def ones_initializer(rows: int, cols: int) -> np.array:
