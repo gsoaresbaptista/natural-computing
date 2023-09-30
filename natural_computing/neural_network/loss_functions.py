@@ -62,7 +62,7 @@ def neg_log_likelihood(
     return np.mean(-np.log(values))
 
 
-def softmax_neg_likelihood(
+def softmax_neg_log_likelihood(
     y: np.array,
     y_pred: np.array,
     derivative: bool = False,
