@@ -24,11 +24,13 @@ if __name__ == '__main__':
     factory = LayerFactory()
 
     nn = NeuralNetwork(learning_rate=1e-3, loss_function=mse, momentum=0.9)
-    nn._layers.append(factory.dense_layer(input_dim, 10, 'relu', **reg))
-    nn._layers.append(factory.dense_layer(10, 10, 'relu', **reg))
-    nn._layers.append(factory.dense_layer(10, output_dim, 'linear', **reg))
+    nn.add_layer([
+        factory.dense_layer(input_dim, 10, 'relu', **reg),
+        factory.dense_layer(10, 10, 'relu', batch_normalization=True, **reg),
+        factory.dense_layer(10, output_dim, 'linear', **reg),
+    ])
 
-    nn.fit(x_shuffled, y_shuffled, epochs=5000, batch_size=320, verbose=500)
+    nn.fit(x_shuffled, y_shuffled, epochs=10000, batch_size=320, verbose=500)
 
     plt.scatter(x, y)
     plt.plot(x, nn.predict(x_std), c='green')

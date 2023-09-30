@@ -78,6 +78,22 @@ class NeuralNetwork:
         self._best_loss = float('inf')
         self._best_model: List[Dense]
 
+    def add_layer(self, layer: Dense | List[Dense]) -> None:
+        """
+        Add a Dense layer to the neural network.
+
+        Args:
+            layer (Dense | List[Dense]): The Dense layer, or list of
+                Dense Layers, to be added to the network.
+
+        Returns:
+            None
+        """
+        if isinstance(layer, Dense):
+            self._layers.append(layer)
+        else:
+            self._layers.extend(layer)
+
     def fit(
         self,
         x_train: np.array,
