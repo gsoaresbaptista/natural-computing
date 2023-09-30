@@ -30,6 +30,7 @@ class Dense:
     Returns:
         None
     """
+
     def __init__(
         self,
         input_size: int,
@@ -92,10 +93,12 @@ class NeuralNetwork:
             self.__backpropagation(y_train, y_pred)
 
             if (epoch + 1) % verbose == 0:
-                y_pred = self.predict(x_train)
-                loss_train = self._loss_function(y_train, y_pred)
+                d_length = len(str(epochs))
+                loss_train = self._loss_function(
+                    y_train, self.predict(x_train)
+                )
                 print(
-                    f'epoch: {epoch + 1:3}/{epochs:3} | '
+                    f'epoch: {epoch + 1:{d_length}d}/{epochs:{d_length}d} | '
                     f'loss train: {loss_train:.8f}'
                 )
 

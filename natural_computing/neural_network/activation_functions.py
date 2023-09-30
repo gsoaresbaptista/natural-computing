@@ -25,6 +25,24 @@ def sigmoid(x: np.array, derivative: bool = False) -> np.array:
     return sigma * (1 - sigma) if derivative else sigma
 
 
+def tanh(x: np.array, derivative: bool = False) -> np.array:
+    """
+    Apply the hyperbolic tangent (tanh) function to an input array.
+
+    Args:
+        x (np.array): Input array.
+        derivative (bool, optional): Indicates whether you want to compute the
+        derivative (defaults to False).
+
+    Returns:
+        np.array: Output array after applying the tanh function or its
+        derivative if derivative is True.
+    """
+    if derivative:
+        return 1 - tanh(x)**2
+    return (np.exp(x) - np.exp(-x)) / ((np.exp(x) + np.exp(-x)))
+
+
 def linear(x: np.array, derivative: bool = False) -> np.array:
     """
     Apply the linear function to an input array.
