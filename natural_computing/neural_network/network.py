@@ -8,13 +8,20 @@ Classes:
     MultiLayerPerceptron: Implementation of a Multi-Layer Perceptron.
 """
 
-from typing import Callable, List
 from itertools import zip_longest
+from typing import Callable, List
 
 import numpy as np
 
+from natural_computing.utils import (
+    ones_initializer,
+    random_uniform_initializer,
+)
+
 from .activation_functions import linear
 from .loss_functions import mse
+
+weight_generator = Callable[[int, int], np.array]
 
 
 class Dense:
@@ -36,10 +43,12 @@ class Dense:
         input_size: int,
         output_size: int,
         activation: Callable[[np.array, bool], np.array] = linear,
+        weights_initializer: weight_generator = ones_initializer,
+        biases_initializer: weight_generator = random_uniform_initializer,
     ) -> None:
         self._input = None
-        self._weights = np.random.randn(output_size, input_size)
-        self._biases = np.random.randn(1, output_size)
+        self._weights = weights_initializer(output_size, input_size)
+        self._biases = biases_initializer(1, output_size)
         self._activation = activation
         # intermediary values
         self._activation_input, self._activation_output = None, None

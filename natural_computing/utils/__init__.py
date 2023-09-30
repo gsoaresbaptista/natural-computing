@@ -9,6 +9,11 @@ from .math import (
     mul_list,
     sub_lists,
     sum_lists,
+    zeros_initializer,
+    ones_initializer,
+    random_uniform_initializer,
+    glorot_uniform_initializer,
+    glorot_normal_initializer
 )
 
 __all__ = [
@@ -20,4 +25,9 @@ __all__ = [
     'inverse_binary',
     'bounded_random_vectors',
     'argsort',
+    'zeros_initializer',
+    'ones_initializer',
+    'random_uniform_initializer',
+    'glorot_uniform_initializer',
+    'glorot_normal_initializer',
 ]
