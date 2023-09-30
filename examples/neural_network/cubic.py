@@ -25,7 +25,7 @@ if __name__ == '__main__':
     x_shuffled, y_shuffled = x_std[indices], y[indices]
     reg = {'regularization_strength': 0.001}
 
-    nn = NeuralNetwork(learning_rate=1e-2, loss_function=mse)
+    nn = NeuralNetwork(learning_rate=1e-3, loss_function=mse, momentum=0.9)
     nn._layers.append(Dense(input_dim, 10, activation=tanh, **reg))
     nn._layers.append(Dense(10, 10, activation=tanh, **reg))
     nn._layers.append(Dense(10, output_dim, activation=linear, **reg))

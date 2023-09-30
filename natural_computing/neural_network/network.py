@@ -80,6 +80,7 @@ class Dense:
         self._dropout_mask = None
         self._activation_input, self._activation_output = None, None
         self._dweights, self._dbiases = None, None
+        self._prev_dweights = 0.0
 
 
 class NeuralNetwork:
@@ -87,6 +88,7 @@ class NeuralNetwork:
         self,
         learning_rate: float,
         loss_function: Callable[[np.array, np.array], np.array] = mse,
+        momentum: float = 0.0,
     ) -> None:
         """
         Initialize a neural network.
@@ -95,6 +97,8 @@ class NeuralNetwork:
             learning_rate (float): Learning rate for training.
             loss_function (Callable, optional): Loss function used for
                 training (defaults to the mean squared error (MSE)).
+            momentum (float, optional):
+                Momentum for optimizing the training process (defaults to 0.0).
 
         Returns:
             None
@@ -102,6 +106,7 @@ class NeuralNetwork:
         self._layers: List[Dense] = []
         self._learning_rate = learning_rate
         self._loss_function = loss_function
+        self._momentum = momentum
 
     def fit(
         self,
@@ -225,7 +230,6 @@ class NeuralNetwork:
             layer._dweights = dactivation.T.dot(layer._input)
             layer._dbias = 1.0 * dactivation.sum(axis=0, keepdims=True)
 
-        # update weights and biases
         for layer in reversed(self._layers):
             # apply regularization
             layer._dweights = layer._dweights + (
@@ -234,7 +238,12 @@ class NeuralNetwork:
                 layer._weights, derivative=True
             )
 
-            layer._weights = (
-                layer._weights - self._learning_rate * layer._dweights
+            # apply momentum
+            layer._prev_dweights = (
+                -self._learning_rate * layer._dweights
+                + self._momentum * layer._prev_dweights
             )
+
+            # update weights and biases
+            layer._weights = layer._weights + layer._prev_dweights
             layer._biases = layer._biases - self._learning_rate * layer._dbias
