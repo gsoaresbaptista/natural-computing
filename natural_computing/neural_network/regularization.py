@@ -23,7 +23,7 @@ def l1_regularization(weights: np.array, derivative: bool = False) -> np.array:
     """
     if derivative:
         return np.array([np.where(w >= 0, 1, -1) for w in weights])
-    return np.sum([np.sum(np.abs(w)) for w in weights])
+    return np.sum([np.sum(np.abs(w)) for w in weights])  # type: ignore
 
 
 def l2_regularization(weights: np.array, derivative: bool = False) -> np.array:
@@ -41,7 +41,7 @@ def l2_regularization(weights: np.array, derivative: bool = False) -> np.array:
     """
     if derivative:
         return weights
-    return 0.5 * np.sum(weights**2)
+    return 0.5 * np.sum(weights**2)  # type: ignore
 
 
 def learning_rate_no_decay(

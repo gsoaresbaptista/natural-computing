@@ -9,8 +9,9 @@ Classes:
     NeuralNetwork: Implementation of a Multi-Layer Perceptron.
 """
 
+from copy import deepcopy
 from itertools import zip_longest
-from typing import Callable, Iterable, List, Tuple
+from typing import Callable, Iterable, List, Tuple, Union
 
 import numpy as np
 
@@ -97,6 +98,7 @@ class NeuralNetwork:
         lr_decay_steps: int = 1,
         loss_function: loss_fn = mse,
         momentum: float = 0.0,
+        patience: int | float = float('inf'),
     ) -> None:
         """
         Initialize a neural network.
@@ -120,6 +122,10 @@ class NeuralNetwork:
             momentum (float, optional):
                 Momentum for optimizing the training process (defaults to 0.0).
 
+            patience (int | float, optional):
+                Patience for early stopping during training (defaults to
+                infinity (no early stopping)).
+
         Returns:
             None
         """
@@ -130,11 +136,17 @@ class NeuralNetwork:
         self._lr_decay_steps = lr_decay_steps
         self._loss_function = loss_function
         self._momentum = momentum
+        self._patience = patience
+        self._waiting = 0
+        self._best_loss = float('inf')
+        self._best_model: List[Dense]
 
     def fit(
         self,
         x_train: np.array,
         y_train: np.array,
+        x_val: Union[np.array, None] = None,
+        y_val: Union[np.array, None] = None,
         epochs: int = 100,
         batch_generator: batch_generator_fn = batch_sequential,
         batch_size: int | None = None,
@@ -147,6 +159,12 @@ class NeuralNetwork:
             x_train (np.array): Input training data.
 
             y_train (np.array): Target training data.
+
+            x_val (np.array | None, optional):
+                Input validation data (defaults to None (no validation set)).
+
+            y_val (np.array | None, optional):
+                Target validation data (defaults to None (no validation set)).
 
             epochs (int, optional): Number of training epochs
                 (defaults to 100).
@@ -166,6 +184,18 @@ class NeuralNetwork:
         # saves initial learning rate for restoration after fit
         learning_rate = self._learning_rate
 
+        # initial settings for patience to work
+        self._best_model = deepcopy(self._layers)
+        self._best_loss = float('inf')
+
+        # update x_val and y_val
+        if x_val is None or y_val is None:
+            print(
+                '* The X_val or Y_val set was not informed, '
+                'the training sets will be used'
+            )
+            x_val, y_val = x_train, y_train
+
         for epoch in range(epochs):
             self._learning_rate = self._lr_decay_fn(
                 learning_rate,
@@ -179,6 +209,21 @@ class NeuralNetwork:
                 y_pred = self.__feedforward(x_batch)
                 self.__backpropagation(y_batch, y_pred)
 
+            # check early stop
+            loss_val = self._loss_function(y_val, self.predict(x_val))
+
+            if loss_val < self._best_loss:
+                self._best_model = deepcopy(self._layers)
+                self._best_loss, self._waiting = loss_val, 0
+            else:
+                self._waiting += 1
+
+                if self._waiting >= self._patience:
+                    print(f'* early stopping at epoch {epoch + 1}')
+                    self._layers = self._best_model
+                    break
+
+            # print loss
             if (epoch + 1) % verbose == 0:
                 # compute regularization loss
                 loss_reg = (1.0 / y_train.shape[0]) * np.sum(

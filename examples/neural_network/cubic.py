@@ -30,7 +30,7 @@ if __name__ == '__main__':
     nn._layers.append(Dense(10, 10, activation=tanh, **reg))
     nn._layers.append(Dense(10, output_dim, activation=linear, **reg))
 
-    nn.fit(x_shuffled, y_shuffled, 5000, batch_size=32, verbose=500)
+    nn.fit(x_shuffled, y_shuffled, epochs=5000, batch_size=320, verbose=500)
 
     plt.scatter(x, y)
     plt.plot(x, nn.predict(x_std), c='green')
