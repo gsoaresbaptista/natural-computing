@@ -1,11 +1,12 @@
 """
-MultiLayerPerceptron Module
+Neural Network Module
 
     This module implements a Multi-Layer Perceptron with backpropagation for
     weight optimization.
 
 Classes:
-    MultiLayerPerceptron: Implementation of a Multi-Layer Perceptron.
+    Dense: Implementation of a fully-connected layer.
+    NeuralNetwork: Implementation of a Multi-Layer Perceptron.
 """
 
 from itertools import zip_longest
@@ -14,14 +15,16 @@ from typing import Callable, List
 import numpy as np
 
 from natural_computing.utils import (
-    ones_initializer,
-    random_uniform_initializer,
+    zeros_initializer,
+    glorot_normal_initializer,
 )
 
 from .activation_functions import linear
 from .loss_functions import mse
+from .regularization import l2_regularization
 
-weight_generator = Callable[[int, int], np.array]
+weight_generator_fn = Callable[[int, int], np.array]
+regularization_fn = Callable[[np.array, bool], np.array]
 
 
 class Dense:
@@ -30,38 +33,47 @@ class Dense:
         input_size: int,
         output_size: int,
         activation: Callable[[np.array, bool], np.array] = linear,
-        weights_initializer: weight_generator = ones_initializer,
-        biases_initializer: weight_generator = random_uniform_initializer,
+        weights_initializer: weight_generator_fn = glorot_normal_initializer,
+        biases_initializer: weight_generator_fn = zeros_initializer,
+        regularization: regularization_fn = l2_regularization,
+        regularization_strength: float = 0.0,
         dropout_probability: float = 0.0,
     ) -> None:
         """
-        Initialize a Dense layer for a neural network.
+        Implementation of a fully-connected layer.
 
         Args:
             input_size (int): Number of input neurons.
 
             output_size (int): Number of output neurons.
 
-            activation (Callable, optional): Activation function to be used in
-                the layer (defaults to the linear activation function).
+            activation (Callable[[np.array, bool], np.array], optional):
+                Activation function to be used in the layer
+                (defaults to linear).
 
-            weights_initializer (weight_generator, optional): Weight
-                initialization function (defaults to ones initializer).
-
-            biases_initializer (weight_generator, optional): Biases
-                initialization function (defaults to random uniform
+            weights_initializer (weight_generator_fn, optional):
+                Weight initialization function (defaults to glorot normal
                 initializer).
 
-            dropout_probability (float, optional): Dropout probability for
-                regularization (defaults to 0.0.).
+            biases_initializer (weight_generator_fn, optional):
+                Biases initialization function. Defaults to zeros_initializer.
 
-        Returns:
-            None
+            regularization (regularization_fn, optional):
+                Regularization function to apply to the weights (defaults to
+                l2_regularization).
+
+            regularization_strength (float, optional):
+                Strength of the regularization term (defaults to 0.0).
+
+            dropout_probability (float, optional):
+                Dropout probability for regularization (defaults to 0.0).
         """
         self._input = None
         self._weights = weights_initializer(output_size, input_size)
         self._biases = biases_initializer(1, output_size)
         self._activation = activation
+        self._regularization = regularization
+        self._regularization_strength = regularization_strength
         self._dropout_probability = dropout_probability
 
         # intermediary values
@@ -117,13 +129,28 @@ class NeuralNetwork:
             self.__backpropagation(y_train, y_pred)
 
             if (epoch + 1) % verbose == 0:
-                d_length = len(str(epochs))
+                # compute regularization loss
+                loss_reg = (1.0 / y_train.shape[0]) * np.sum(
+                    [
+                        layer._regularization_strength
+                        * layer._regularization(layer._weights)
+                        for layer in self._layers
+                    ]
+                )
+
+                # compute train loss
                 loss_train = self._loss_function(
                     y_train, self.predict(x_train)
                 )
+
+                # get information to format output
+                d_length = len(str(epochs))
+
                 print(
                     f'epoch: {epoch + 1:{d_length}d}/{epochs:{d_length}d} | '
-                    f'loss train: {loss_train:.8f}'
+                    f'loss train: {loss_train:.4f} | '
+                    f'loss reg.: {loss_reg:.4f} | '
+                    f'sum: {loss_train + loss_reg:.4f} '
                 )
 
     def predict(self, x: np.array) -> np.array:
@@ -191,7 +218,8 @@ class NeuralNetwork:
         for layer in reversed(self._layers):
             dactivation = (
                 layer._activation(layer._activation_input, derivative=True)
-                * last_delta * layer._dropout_mask
+                * last_delta
+                * layer._dropout_mask
             )
             last_delta = dactivation.dot(layer._weights)
             layer._dweights = dactivation.T.dot(layer._input)
@@ -199,6 +227,13 @@ class NeuralNetwork:
 
         # update weights and biases
         for layer in reversed(self._layers):
+            # apply regularization
+            layer._dweights = layer._dweights + (
+                1.0 / y.shape[0]
+            ) * layer._regularization_strength * layer._regularization(
+                layer._weights, derivative=True
+            )
+
             layer._weights = (
                 layer._weights - self._learning_rate * layer._dweights
             )
