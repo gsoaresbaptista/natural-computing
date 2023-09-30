@@ -39,7 +39,7 @@ def tanh(x: np.array, derivative: bool = False) -> np.array:
         derivative if derivative is True.
     """
     if derivative:
-        return 1 - tanh(x)**2
+        return 1 - tanh(x) ** 2
     return (np.exp(x) - np.exp(-x)) / ((np.exp(x) + np.exp(-x)))
 
 

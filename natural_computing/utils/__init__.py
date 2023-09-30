@@ -13,7 +13,7 @@ from .math import (
     ones_initializer,
     random_uniform_initializer,
     glorot_uniform_initializer,
-    glorot_normal_initializer
+    glorot_normal_initializer,
 )
 
 __all__ = [

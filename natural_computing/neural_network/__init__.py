@@ -1,4 +1,4 @@
-from .activation_functions import sigmoid, linear, relu
+from .activation_functions import sigmoid, linear, relu, tanh
 from .loss_functions import (
     mae,
     mse,
@@ -12,6 +12,7 @@ __all__ = [
     'sigmoid',
     'linear',
     'relu',
+    'tanh',
     'mae',
     'mse',
     'neg_log_likelihood',
