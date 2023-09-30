@@ -1,5 +1,5 @@
 """
-MultiLayerPerceptron Module
+Regularization Module
 
     This module implements regularization techniques for use with the neural
     network implementation.
