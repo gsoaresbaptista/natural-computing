@@ -10,21 +10,23 @@ Classes:
 """
 
 from itertools import zip_longest
-from typing import Callable, List
+from typing import Callable, Iterable, List, Tuple
 
 import numpy as np
 
 from natural_computing.utils import (
-    zeros_initializer,
     glorot_normal_initializer,
+    zeros_initializer,
 )
 
 from .activation_functions import linear
 from .loss_functions import mse
 from .regularization import l2_regularization
+from .utils import batch_sequential
 
 weight_generator_fn = Callable[[int, int], np.array]
 regularization_fn = Callable[[np.array, bool], np.array]
+batch_generator_fn = Iterable[Tuple[np.array, np.array]]
 
 
 class Dense:
@@ -113,6 +115,8 @@ class NeuralNetwork:
         x_train: np.array,
         y_train: np.array,
         epochs: int = 100,
+        batch_generator: batch_generator_fn = batch_sequential,
+        batch_size: int | None = None,
         verbose: int = 10,
     ) -> None:
         """
@@ -120,18 +124,30 @@ class NeuralNetwork:
 
         Args:
             x_train (np.array): Input training data.
+
             y_train (np.array): Target training data.
+
             epochs (int, optional): Number of training epochs
                 (defaults to 100).
+
             verbose (int, optional): Frequency of progress updates
                 (defaults to 10).
+
+            batch_generator (batch_generator_fn): Batch generator function to
+                use for training (defaults to batch_sequential).
+
+            batch_size (int | None, optional): Size of each batch (defaults to
+                None).
 
         Returns:
             None
         """
         for epoch in range(epochs):
-            y_pred = self.__feedforward(x_train)
-            self.__backpropagation(y_train, y_pred)
+            batches = batch_generator(x_train, y_train, batch_size)
+
+            for x_batch, y_batch in batches:
+                y_pred = self.__feedforward(x_batch)
+                self.__backpropagation(y_batch, y_pred)
 
             if (epoch + 1) % verbose == 0:
                 # compute regularization loss
