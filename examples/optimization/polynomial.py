@@ -42,6 +42,6 @@ if __name__ == '__main__':
 
     if SAVE_GIF:
         writer = animation.PillowWriter(fps=10)
-        ani.save('scatter.gif', writer=writer)
+        ani.save('pso_quadratic_animation.gif', writer=writer)
     else:
         plt.show()
