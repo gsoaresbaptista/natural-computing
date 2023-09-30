@@ -5,7 +5,7 @@ from .loss_functions import (
     mse,
     neg_log_likelihood,
     softmax,
-    softmax_neg_likelihood,
+    softmax_neg_log_likelihood,
 )
 from .network import NeuralNetwork
 from .regularization import (
@@ -27,7 +27,7 @@ __all__ = [
     'mse',
     'neg_log_likelihood',
     'softmax',
-    'softmax_neg_likelihood',
+    'softmax_neg_log_likelihood',
     'NeuralNetwork',
     'Dense',
     'l1_regularization',

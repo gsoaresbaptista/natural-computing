@@ -5,7 +5,9 @@ Neural Network Module
     weight optimization.
 """
 
+from __future__ import annotations
 from copy import deepcopy
+import pickle
 from itertools import zip_longest
 from typing import Callable, Iterable, List, Tuple, Union
 
@@ -93,6 +95,32 @@ class NeuralNetwork:
             self._layers.append(layer)
         else:
             self._layers.extend(layer)
+
+    def save(self, file_path: str) -> None:
+        """
+        Save the neural network to a file using pickle.
+
+        Args:
+            file_path (str): The file path where the network will be saved.
+
+        Returns:
+            None
+        """
+        pickle.dump(self, open(file_path, 'wb'), -1)
+
+    @staticmethod
+    def load(file_path: str) -> NeuralNetwork:
+        """
+        Load a neural network from a saved file using pickle.
+
+        Args:
+            file_path (str): The file path from which the network will be
+            loaded.
+
+        Returns:
+            NeuralNetwork: The loaded neural network.
+        """
+        return pickle.load(open(file_path, 'rb'))
 
     def fit(
         self,
