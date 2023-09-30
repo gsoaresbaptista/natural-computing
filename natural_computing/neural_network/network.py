@@ -21,9 +21,12 @@ from natural_computing.utils import (
 
 from .activation_functions import linear
 from .loss_functions import mse
-from .regularization import l2_regularization
+from .regularization import l2_regularization, learning_rate_no_decay
 from .utils import batch_sequential
 
+# type hinting for functions
+loss_fn = Callable[[np.array, np.array], np.array]
+lr_decay_fn = Callable[[float, int, float, int], int]
 weight_generator_fn = Callable[[int, int], np.array]
 regularization_fn = Callable[[np.array, bool], np.array]
 batch_generator_fn = Iterable[Tuple[np.array, np.array]]
@@ -89,7 +92,10 @@ class NeuralNetwork:
     def __init__(
         self,
         learning_rate: float,
-        loss_function: Callable[[np.array, np.array], np.array] = mse,
+        lr_decay_fn: lr_decay_fn = learning_rate_no_decay,
+        lr_decay_rate: float = 0.0,
+        lr_decay_steps: int = 1,
+        loss_function: loss_fn = mse,
         momentum: float = 0.0,
     ) -> None:
         """
@@ -97,8 +103,20 @@ class NeuralNetwork:
 
         Args:
             learning_rate (float): Learning rate for training.
-            loss_function (Callable, optional): Loss function used for
+
+            lr_decay_fn (lr_decay_fn, optional):
+                Learning rate decay function (defaults to learning rate
+                no decay).
+
+            lr_decay_rate (float, optional):
+                Learning rate decay rate (defaults to 0.0).
+
+            lr_decay_steps (int, optional):
+                Number of steps for learning rate decay (defaults to 1).
+
+            loss_function (loss_fn): Loss function used for
                 training (defaults to the mean squared error (MSE)).
+
             momentum (float, optional):
                 Momentum for optimizing the training process (defaults to 0.0).
 
@@ -107,6 +125,9 @@ class NeuralNetwork:
         """
         self._layers: List[Dense] = []
         self._learning_rate = learning_rate
+        self._lr_decay_fn = lr_decay_fn
+        self._lr_decay_rate = lr_decay_rate
+        self._lr_decay_steps = lr_decay_steps
         self._loss_function = loss_function
         self._momentum = momentum
 
@@ -142,7 +163,16 @@ class NeuralNetwork:
         Returns:
             None
         """
+        # saves initial learning rate for restoration after fit
+        learning_rate = self._learning_rate
+
         for epoch in range(epochs):
+            self._learning_rate = self._lr_decay_fn(
+                learning_rate,
+                epoch,
+                self._lr_decay_rate,
+                self._lr_decay_steps,
+            )
             batches = batch_generator(x_train, y_train, batch_size)
 
             for x_batch, y_batch in batches:
@@ -173,6 +203,9 @@ class NeuralNetwork:
                     f'loss reg.: {loss_reg:.4f} | '
                     f'sum: {loss_train + loss_reg:.4f} '
                 )
+
+        # restore initial settings
+        self._learning_rate = learning_rate
 
     def predict(self, x: np.array) -> np.array:
         """
