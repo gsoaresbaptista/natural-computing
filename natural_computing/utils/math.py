@@ -107,7 +107,7 @@ def argsort(list: List[float]) -> List[int]:
     return sorted(range(len(list)), key=list.__getitem__)
 
 
-def zeros_initializer(rows: int, cols: int) -> np.array:
+def zeros_initializer(rows: int, cols: int) -> np.ndarray:
     """
     Initialize weights with zeros.
 
@@ -116,12 +116,12 @@ def zeros_initializer(rows: int, cols: int) -> np.array:
         cols (int): Number of columns in the weight matrix.
 
     Returns:
-        np.array: Weight matrix filled with zeros.
+        np.ndarray: Weight matrix filled with zeros.
     """
     return np.zeros((rows, cols))
 
 
-def ones_initializer(rows: int, cols: int) -> np.array:
+def ones_initializer(rows: int, cols: int) -> np.ndarray:
     """
     Initialize weights with ones.
 
@@ -130,12 +130,12 @@ def ones_initializer(rows: int, cols: int) -> np.array:
         cols (int): Number of columns in the weight matrix.
 
     Returns:
-        np.array: Weight matrix filled with ones.
+        np.ndarray: Weight matrix filled with ones.
     """
     return np.ones((rows, cols))
 
 
-def random_uniform_initializer(rows: int, cols: int) -> np.array:
+def random_uniform_initializer(rows: int, cols: int) -> np.ndarray:
     """
     Initialize weights with random values from a standard normal distribution.
 
@@ -144,12 +144,12 @@ def random_uniform_initializer(rows: int, cols: int) -> np.array:
         cols (int): Number of columns in the weight matrix.
 
     Returns:
-        np.array: Weight matrix with random values.
+        np.ndarray: Weight matrix with random values.
     """
     return np.random.randn(rows, cols)
 
 
-def glorot_normal_initializer(rows: int, cols: int) -> np.array:
+def glorot_normal_initializer(rows: int, cols: int) -> np.ndarray:
     """
     Initialize weights using Glorot normal initialization (Xavier
         initialization).
@@ -159,13 +159,13 @@ def glorot_normal_initializer(rows: int, cols: int) -> np.array:
         cols (int): Number of columns in the weight matrix.
 
     Returns:
-        np.array: Weight matrix initialized with Glorot normal values.
+        np.ndarray: Weight matrix initialized with Glorot normal values.
     """
     std_dev = np.sqrt(2.0 / (rows + cols))
     return std_dev * np.random.randn(rows, cols)
 
 
-def glorot_uniform_initializer(rows: int, cols: int) -> np.array:
+def glorot_uniform_initializer(rows: int, cols: int) -> np.ndarray:
     """
     Initialize weights using Glorot uniform initialization.
 
@@ -174,7 +174,7 @@ def glorot_uniform_initializer(rows: int, cols: int) -> np.array:
         cols (int): Number of columns in the weight matrix.
 
     Returns:
-        np.array: Weight matrix initialized with Glorot uniform values.
+        np.ndarray: Weight matrix initialized with Glorot uniform values.
     """
     limit = np.sqrt(6.0 / (rows + cols))
     return 2 * limit * np.random.randn(rows, cols) - limit

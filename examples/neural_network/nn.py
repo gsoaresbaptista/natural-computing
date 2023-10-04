@@ -1,7 +1,7 @@
 import numpy as np
 from natural_computing.neural_network import (
     NeuralNetwork,
-    softmax_neg_likelihood,
+    softmax_neg_log_likelihood,
 )
 from natural_computing.utils import LayerFactory
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     d3._weights = w3
     d3._biases = b3
 
-    net = NeuralNetwork(0.01, loss_function=softmax_neg_likelihood)
+    net = NeuralNetwork(0.01, loss_function=softmax_neg_log_likelihood)
     net.add_layer(d1)
     net.add_layer(d2)
     net.add_layer(d3)

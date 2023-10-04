@@ -11,8 +11,8 @@ import numpy as np
 
 from natural_computing.utils import ones_initializer, zeros_initializer
 
-weight_generator_fn = Callable[[int, int], np.array]
-regularization_fn = Callable[[np.array, bool], np.array]
+weight_generator_fn = Callable[[int, int], np.ndarray]
+regularization_fn = Callable[[np.ndarray, bool], np.ndarray]
 
 
 class Dense:
@@ -20,7 +20,7 @@ class Dense:
         self,
         input_size: int,
         output_size: int,
-        activation: Callable[[np.array, bool], np.array],
+        activation: Callable[[np.ndarray, bool], np.ndarray],
         weights_initializer: weight_generator_fn,
         biases_initializer: weight_generator_fn,
         regularization: regularization_fn,
@@ -37,7 +37,7 @@ class Dense:
 
             output_size (int): Number of output neurons.
 
-            activation (Callable[[np.array, bool], np.array], optional):
+            activation (Callable[[np.ndarray, bool], np.ndarray], optional):
                 Activation function to be used in the layer
                 (defaults to linear).
 

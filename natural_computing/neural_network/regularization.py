@@ -10,17 +10,19 @@ import numpy as np
 from .layers import Dense
 
 
-def l1_regularization(weights: np.array, derivative: bool = False) -> np.array:
+def l1_regularization(
+    weights: np.ndarray, derivative: bool = False
+) -> np.ndarray:
     """
     Calculate L1 regularization for a set of weights.
 
     Args:
-        weights (np.array): Array of model weights.
+        weights (np.ndarray): Array of model weights.
         derivative (bool, optional): Indicates whether you want to compute the
             derivative (defaults to False).
 
     Returns:
-        np.array: L1 regularization term or its derivative if derivative is
+        np.ndarray: L1 regularization term or its derivative if derivative is
             True.
     """
     if derivative:
@@ -28,17 +30,19 @@ def l1_regularization(weights: np.array, derivative: bool = False) -> np.array:
     return np.sum([np.sum(np.abs(w)) for w in weights])  # type: ignore
 
 
-def l2_regularization(weights: np.array, derivative: bool = False) -> np.array:
+def l2_regularization(
+    weights: np.ndarray, derivative: bool = False
+) -> np.ndarray:
     """
     Calculate L2 regularization for a set of weights.
 
     Args:
-        weights (np.array): Array of model weights.
+        weights (np.ndarray): Array of model weights.
         derivative (bool, optional): Indicates whether you want to compute the
             derivative (defaults to False).
 
     Returns:
-        np.array: L2 regularization term or its derivative if derivative is
+        np.ndarray: L2 regularization term or its derivative if derivative is
         True.
     """
     if derivative:
@@ -122,7 +126,7 @@ def learning_rate_staircase_decay(
 
 
 def batch_normalization_forward(
-    layer: Dense, x: np.array, training: bool = True
+    layer: Dense, x: np.ndarray, training: bool = True
 ):
     """
     Perform batch normalization forward pass.
@@ -130,13 +134,13 @@ def batch_normalization_forward(
     Args:
         layer (Dense): The dense layer with batch normalization.
 
-        x (np.array): Input data.
+        x (np.ndarray): Input data.
 
         training (bool, optional): Flag indicating if it's during training
             (defaults to True).
 
     Returns:
-        np.array: Output data after batch normalization.
+        np.ndarray: Output data after batch normalization.
     """
     mu = np.mean(x, axis=0) if training else layer._population_mean
     var = np.var(x, axis=0) if training else layer._population_var
@@ -161,18 +165,18 @@ def batch_normalization_forward(
 
 
 def batch_normalization_backward(
-    layer: Dense, dactivation: np.array
-) -> np.array:
+    layer: Dense, dactivation: np.ndarray
+) -> np.ndarray:
     """
     Perform batch normalization backward pass.
 
     Args:
         layer (Dense): The dense layer with batch normalization.
 
-        dactivation (np.array): Gradient of the activation.
+        dactivation (np.ndarray): Gradient of the activation.
 
     Returns:
-        np.array: Gradient with respect to the input data.
+        np.ndarray: Gradient with respect to the input data.
     """
     # extract cached values from the layer, and batch size from input
     x, x_norm, mu, var = layer._batch_norm_cache

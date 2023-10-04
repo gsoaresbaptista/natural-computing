@@ -23,9 +23,9 @@ from .regularization import (
 from .utils import batch_sequential
 
 # type hinting for functions
-loss_fn = Callable[[np.array, np.array], np.array]
+loss_fn = Callable[[np.ndarray, np.ndarray], np.ndarray]
 lr_decay_fn = Callable[[float, int, float, int], int]
-batch_generator_fn = Iterable[Tuple[np.array, np.array]]
+batch_generator_fn = Iterable[Tuple[np.ndarray, np.ndarray]]
 
 
 class NeuralNetwork:
@@ -124,10 +124,10 @@ class NeuralNetwork:
 
     def fit(
         self,
-        x_train: np.array,
-        y_train: np.array,
-        x_val: Union[np.array, None] = None,
-        y_val: Union[np.array, None] = None,
+        x_train: np.ndarray,
+        y_train: np.ndarray,
+        x_val: Union[np.ndarray, None] = None,
+        y_val: Union[np.ndarray, None] = None,
         epochs: int = 100,
         batch_generator: batch_generator_fn = batch_sequential,
         batch_size: int | None = None,
@@ -137,14 +137,14 @@ class NeuralNetwork:
         Train the neural network.
 
         Args:
-            x_train (np.array): Input training data.
+            x_train (np.ndarray): Input training data.
 
-            y_train (np.array): Target training data.
+            y_train (np.ndarray): Target training data.
 
-            x_val (np.array | None, optional):
+            x_val (np.ndarray | None, optional):
                 Input validation data (defaults to None (no validation set)).
 
-            y_val (np.array | None, optional):
+            y_val (np.ndarray | None, optional):
                 Target validation data (defaults to None (no validation set)).
 
             epochs (int, optional): Number of training epochs
@@ -233,30 +233,30 @@ class NeuralNetwork:
         # restore initial settings
         self._learning_rate = learning_rate
 
-    def predict(self, x: np.array) -> np.array:
+    def predict(self, x: np.ndarray) -> np.ndarray:
         """
         Make predictions using the trained neural network.
 
         Args:
-            x (np.array): Input data.
+            x (np.ndarray): Input data.
 
         Returns:
-            np.array: Predicted output.
+            np.ndarray: Predicted output.
         """
         return self.__feedforward(x, training=False)
 
-    def __feedforward(self, x: np.array, training: bool = True) -> np.array:
+    def __feedforward(self, x: np.ndarray, training: bool = True) -> np.ndarray:
         """
         Perform the feedforward pass through the Dense layer.
 
         Args:
-            x (np.array): Input data.
+            x (np.ndarray): Input data.
 
             training (bool, optional): Indicates whether the feedforward
                 pass is performed during training (defaults to True).
 
         Returns:
-            np.array: Output of the feedforward pass.
+            np.ndarray: Output of the feedforward pass.
         """
         self._layers[0]._input = x
         layer_pairs = zip_longest(self._layers, self._layers[1:])
@@ -285,13 +285,13 @@ class NeuralNetwork:
 
         return self._layers[-1]._activation_output
 
-    def __backpropagation(self, y: np.array, y_pred: np.array) -> None:
+    def __backpropagation(self, y: np.ndarray, y_pred: np.ndarray) -> None:
         """
         Perform the backpropagation algorithm to update weights and biases.
 
         Args:
-            y (np.array): Target values.
-            y_pred (np.array): Predicted values.
+            y (np.ndarray): Target values.
+            y_pred (np.ndarray): Predicted values.
 
         Returns:
             None

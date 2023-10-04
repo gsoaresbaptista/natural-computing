@@ -32,7 +32,7 @@ def make_cubic(
             (defaults to 0).
 
     Returns:
-        np.array, np.array: Returns a tuple containing two arrays:
+        np.ndarray, np.ndarray: Returns a tuple containing two arrays:
             - The first array is `x` values (shape: (n_samples, 1)).
             - The second array is `y` values corresponding to the cubic
                 function with noise (shape: (n_samples, 1)).

@@ -400,6 +400,9 @@ class RealGeneticAlgorithm(PopulationBaseOptimizer):
     ) -> List[float]:
         """
         Perform mutation on a child.
+        
+        Note that if the probability is greater than that of mutation, the
+        allele is maintained, only being exchanged if it is smaller.
 
         Args:
             child (List[float]): The child genome.

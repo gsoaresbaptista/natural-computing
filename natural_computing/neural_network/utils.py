@@ -12,18 +12,18 @@ import numpy as np
 
 
 def batch_sequential(
-    x: np.array, y: np.array, batch_size: int | None = None
-) -> Iterable[Tuple[np.array, np.array]]:
+    x: np.ndarray, y: np.ndarray, batch_size: int | None = None
+) -> Iterable[Tuple[np.ndarray, np.ndarray]]:
     """
     Generate batches of data sequentially.
 
     Args:
-        x (np.array): Input data.
-        y (np.array): Target data.
+        x (np.ndarray): Input data.
+        y (np.ndarray): Target data.
         batch_size (int, optional): Size of each batch (defaults to None).
 
     Yields:
-        Iterable[Tuple[np.array, np.array]]: A tuple of input and target data
+        Iterable[Tuple[np.ndarray, np.ndarray]]: A tuple of input and target data
         for each batch.
     """
     batch_size = x.shape[0] if batch_size is None else batch_size
@@ -37,18 +37,18 @@ def batch_sequential(
 
 
 def batch_shuffle(
-    x: np.array, y: np.array, batch_size: int | None = None
-) -> Iterable[Tuple[np.array, np.array]]:
+    x: np.ndarray, y: np.ndarray, batch_size: int | None = None
+) -> Iterable[Tuple[np.ndarray, np.ndarray]]:
     """
     Generate batches of shuffled data.
 
     Args:
-        x (np.array): Input data.
-        y (np.array): Target data.
+        x (np.ndarray): Input data.
+        y (np.ndarray): Target data.
         batch_size (int, optional): Size of each batch (defaults to None).
 
     Yields:
-        Iterable[Tuple[np.array, np.array]]: A tuple of input and target data
+        Iterable[Tuple[np.ndarray, np.ndarray]]: A tuple of input and target data
         for each batch.
     """
     shuffle_index = np.random.permutation(range(x.shape[0]))
