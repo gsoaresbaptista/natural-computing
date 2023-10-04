@@ -3,6 +3,7 @@ from .layers import Dense
 from .loss_functions import (
     mae,
     mse,
+    rmse,
     neg_log_likelihood,
     softmax,
     softmax_neg_log_likelihood,
@@ -25,6 +26,7 @@ __all__ = [
     'tanh',
     'mae',
     'mse',
+    'rmse',
     'neg_log_likelihood',
     'softmax',
     'softmax_neg_log_likelihood',
