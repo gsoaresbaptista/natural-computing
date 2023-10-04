@@ -245,7 +245,9 @@ class NeuralNetwork:
         """
         return self.__feedforward(x, training=False)
 
-    def __feedforward(self, x: np.ndarray, training: bool = True) -> np.ndarray:
+    def __feedforward(
+        self, x: np.ndarray, training: bool = True
+    ) -> np.ndarray:
         """
         Perform the feedforward pass through the Dense layer.
 

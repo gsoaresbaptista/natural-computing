@@ -49,8 +49,8 @@ def neg_log_likelihood(
             derivative (default is False).
 
     Returns:
-        np.ndarray: Negative log-likelihood loss or its derivative if derivative
-            is True.
+        np.ndarray: Negative log-likelihood loss or its derivative if
+            derivative is True.
     """
     indices = np.nonzero(y_pred * y)
     values = y_pred[indices]
@@ -123,3 +123,26 @@ def mse(y: np.ndarray, y_pred: np.ndarray, derivative=False) -> np.ndarray:
     if derivative:
         return (y_pred - y) / y.shape[0]
     return 0.5 * np.mean((y - y_pred) ** 2)
+
+
+def rmse(y: np.array, y_pred: np.array, derivative=False) -> np.array:
+    """
+    Calculate the Root Mean Squared Error (RMSE) between predicted and true
+    values.
+
+    Args:
+        y (np.array): True values.
+        y_pred (np.array): Predicted values.
+        derivative (bool, optional): Indicates whether you want to compute the
+            derivative (defaults to True).
+
+    Returns:
+        np.array: RMSE or its derivative if derivative is True.
+    """
+    difference = y - y_pred
+    mse_value = np.sqrt(np.mean(difference ** 2))
+
+    if derivative:
+        return -difference/(y.shape[0] * mse_value)
+
+    return mse_value
