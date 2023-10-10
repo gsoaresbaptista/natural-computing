@@ -49,7 +49,7 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
 
         _optimization_step(objective_function): Optimization step using PSO.
 
-        _update_velocity(velocity, current_position, best_personal_position,
+        update_velocity(velocity, current_position, best_personal_position,
             best_global_position): Update particle velocity using PSO
             equations.
 
@@ -121,13 +121,13 @@ class ParticleSwarmOptimization(PopulationBaseOptimizer):
             )
 
             # update particle velocity and position
-            new_vel = self._update_velocity(
+            new_vel = self.update_velocity(
                 velocity,
                 current_position,
                 best_personal_position,
                 self.best_global_position,
             )
-            new_pos = self._update_position(current_position, new_vel)
+            new_pos = self.update_position(current_position, new_vel)
 
             # evaluate the objective function
             fit = objective_function.evaluate(new_pos)
