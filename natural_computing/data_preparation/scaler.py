@@ -81,7 +81,8 @@ class StandardScaler:
 
 class MinMaxScaler:
     """
-    MinMaxScaler scales data to the range [0, 1].
+    MinMaxScaler scales data to the range [0, 1] or [-1, 1] if
+        centered_on_zero is false.
 
     Args:
         centered_on_zero (bool, optional): If True, the scaled data is

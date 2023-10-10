@@ -4,7 +4,7 @@ Dataset Module
 This module provides functions for creating and splitting datasets.
 """
 
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy as np
 import requests
@@ -78,34 +78,98 @@ def split_train_test(
     )
 
 
+def filter_strings(input_list, filters):
+    """
+    Apply a list of filter functions to each element of the input list.
+
+    Args:
+        input_list (list): The list of strings to be filtered.
+        filters (list): A list of filter functions to apply to each element.
+
+    Returns:
+        list: A list of elements after applying the filter functions.
+
+    Note:
+        - The function iterates through the input list and applies each filter
+            function
+          to every element in the list.
+        - It returns a new list containing the filtered elements.
+    """
+    result = input_list[:]
+
+    for filter_func in filters:
+        result = list(map(filter_func, result))
+
+    return result
+
+
 def fetch_file_and_convert_to_array(
-    url: str, separator: str = '\n'
+    url: str,
+    separator: str = ',',
+    new_line: str = '\n',
+    skiprows: int = 1,
+    usecols: List[int] | None = None,
+    dtype=np.float32,
 ) -> np.ndarray:
     """
-    Fetch a file from a given URL and convert its contents into a NumPy array.
+    Fetch data from a URL, parse it, and convert it into a NumPy array.
 
     Args:
         url (str): The URL of the file to fetch.
-        separator (str, optional): The separator character to split the file
-            content (default is '\n' (newline character)).
+        separator (str, optional): The delimiter used to split the data into
+            columns (default is ',').
+        new_line (str, optional): The newline character used to split the data
+            into rows (default is '\\n').
+        skiprows (int, optional): The number of header rows to skip
+            (default is 1).
+        usecols (List[int] | None, optional): A list of column indices to
+            select, or None to select all columns (default is None).
+        dtype (type, optional): The data type to which the parsed values
+            should be converted (default is np.float32).
 
     Returns:
-        np.ndarray: A NumPy array containing the data from the fetched file.
+        np.ndarray: A NumPy array containing the parsed data.
 
     Raises:
-        requests.exceptions.RequestException: If there's an issue with the
-            HTTP request.
+        requests.exceptions.RequestException: If there is an issue with the
+            HTTP request or the status code is not 200.
+
+    Note:
+        - The function fetches the file from the given URL using the requests
+            library.
+        - It processes the content by splitting it into lines, removing empty
+            lines, and applying transformations.
+        - The resulting data is stored in a NumPy array with the specified
+            data type.
     """
+
+    def remove_r_fn(s):
+        return s.replace('\r', '')
+
+    def split_fn(s):
+        return s.split(separator)
+
+    def select_cols_fn(s):
+        return (
+            [item for i, item in enumerate(s) if i in usecols]
+            if usecols is not None
+            else s
+        )
+
     try:
         response = requests.get(url)
 
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
-            content = response.text.split(separator)
-            content = [line for line in content if line.strip() != '']
-            data_array = np.array(content, dtype=float)
+            content = response.text.split(new_line)
 
-            return data_array
+            # get only the needed data
+            content = filter_strings(
+                [line for line in content if line.strip() != ''][skiprows:],
+                [remove_r_fn, split_fn, select_cols_fn]
+            )
+
+            return np.array(content, dtype=dtype)
 
         else:
             raise requests.exceptions.RequestException(
