@@ -76,7 +76,7 @@ class RootMeanSquaredErrorForNN(BaseFunction):
         with np.errstate(all='raise'):
             try:
                 y_pred = nn.predict(self._x_data)
-            except RuntimeWarning:
+            except FloatingPointError:
                 return float('inf')
 
         # Compute error
