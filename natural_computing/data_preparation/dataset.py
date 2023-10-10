@@ -7,6 +7,7 @@ This module provides functions for creating and splitting datasets.
 from typing import Tuple
 
 import numpy as np
+import requests
 
 
 def create_window(
@@ -32,7 +33,7 @@ def create_window(
             break
 
         # append data
-        x_data.append(data[i : i + window_size])
+        x_data.append(data[i: i + window_size])
         y_data.append(data[i + window_size])
 
     return (np.array(x_data), np.array(y_data).reshape(-1, 1))
@@ -75,3 +76,42 @@ def split_train_test(
         (x[train_indices], y[train_indices]),
         (x[test_indices], y[test_indices]),
     )
+
+
+def fetch_file_and_convert_to_array(
+    url: str, separator: str = '\n'
+) -> np.ndarray:
+    """
+    Fetch a file from a given URL and convert its contents into a NumPy array.
+
+    Args:
+        url (str): The URL of the file to fetch.
+        separator (str, optional): The separator character to split the file
+            content (default is '\n' (newline character)).
+
+    Returns:
+        np.ndarray: A NumPy array containing the data from the fetched file.
+
+    Raises:
+        requests.exceptions.RequestException: If there's an issue with the
+            HTTP request.
+    """
+    try:
+        response = requests.get(url)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            content = response.text.split(separator)
+            content = [line for line in content if line.strip() != '']
+            data_array = np.array(content, dtype=float)
+
+            return data_array
+
+        else:
+            raise requests.exceptions.RequestException(
+                'Failed to fetch the file. HTTP Status Code: '
+                f'{response.status_code}'
+            )
+
+    except requests.exceptions.RequestException as e:
+        raise e
