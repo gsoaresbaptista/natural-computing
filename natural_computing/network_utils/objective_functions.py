@@ -60,7 +60,8 @@ class RootMeanSquaredErrorForNN(BaseFunction):
             nn_weights (List[float]): A list of network weights.
 
         Returns:
-            float: The RMSE value.
+            float: The RMSE value or 'inf' if a RuntimeWarning (e.g., overflow
+                encountered in exp) occurs.
 
         Note:
             - The function decodes the network weights into a neural network.
@@ -72,8 +73,12 @@ class RootMeanSquaredErrorForNN(BaseFunction):
         nn_weights = np.array(nn_weights).reshape(-1, 1)
         nn = pack_network(nn_weights, self._decode_guide)
 
+        try:
+            y_pred = nn.predict(self._x_data)
+        except RuntimeWarning:
+            return float('inf')
+
         # Compute error
-        y_pred = nn.predict(self._x_data)
         error = np.sqrt(np.mean((y_pred - self._y_data) ** 2))
         weights = [layer._weights.squeeze()**2 for layer in nn._layers]
         error += self._l2_regularization * np.sum([w.sum() for w in weights])
