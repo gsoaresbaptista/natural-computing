@@ -17,6 +17,7 @@ from .math import (
     zeros_initializer,
 )
 from .factories import LayerFactory
+from .network import pack_network, unpack_network
 
 __all__ = [
     'sum_lists',
@@ -34,4 +35,6 @@ __all__ = [
     'glorot_uniform_initializer',
     'glorot_normal_initializer',
     'LayerFactory',
+    'pack_network',
+    'unpack_network',
 ]
