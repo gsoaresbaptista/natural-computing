@@ -1,5 +1,5 @@
 """
-Network Module
+Codification Module
 
     This module provides functions for unpacking and packing neural network
     weights.
@@ -67,11 +67,11 @@ def pack_network(
 
         # unpack weights
         weights = weights_vector[: x * y].reshape((x, y))
-        weights_vector = weights_vector[x * y :]
+        weights_vector = weights_vector[x * y:]
 
         # unpack biases
         biases = weights_vector[: a * b].reshape((a, b))
-        weights_vector = weights_vector[a * b :]
+        weights_vector = weights_vector[a * b:]
 
         # add layer to network
         activation = layer['activation'].__name__

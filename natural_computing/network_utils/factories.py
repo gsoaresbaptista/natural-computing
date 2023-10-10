@@ -17,7 +17,7 @@ from natural_computing.neural_network import (
     tanh,
 )
 
-from .math import (
+from ..utils.math import (
     glorot_normal_initializer,
     glorot_uniform_initializer,
     ones_initializer,
