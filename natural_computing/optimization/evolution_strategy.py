@@ -45,6 +45,7 @@ class EvolutionStrategy(PopulationBaseOptimizer):
         self._dimension = len(search_space)
         self._plus_version = plus_version
         self.population: List[List[float]] = []
+        self.best_global_position: List[float] = [0.0 for _ in search_space]
         self.initialize_population()
 
     def initialize_population(self) -> None:

@@ -47,6 +47,7 @@ class DifferentialEvolution(PopulationBaseOptimizer):
         self.f_const: float = f_const
         self.cr_const: float = cr_const
         self.population: List[List[float]] = []
+        self.best_global_position: List[float] = [0.0 for _ in search_space]
         self.initialize_population()
 
     def initialize_population(self) -> None:

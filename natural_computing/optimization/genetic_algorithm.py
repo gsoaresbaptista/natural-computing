@@ -100,7 +100,7 @@ class BinaryGeneticAlgorithm(PopulationBaseOptimizer):
         self.population_size = population_size
         self.population: List[List[str]] = []
         self.fits: List[float] = []
-        self.best_global_genome: List[str] = []
+        self.best_global_genome: List[str] = ['0'*32 for _ in search_space]
         self.mutation_probability: float = mutation_probability
         self.initialize_population()
 
@@ -204,7 +204,7 @@ class BinaryGeneticAlgorithm(PopulationBaseOptimizer):
         Returns:
             List[List[str]]: A list containing two child genomes.
         """
-        children = [[], []]
+        children: List[List[str]] = [[], []]
 
         for i in range(len(parent_0)):
             # generate positions
@@ -348,7 +348,7 @@ class RealGeneticAlgorithm(PopulationBaseOptimizer):
         self.population_size = population_size
         self.population: List[List[float]] = []
         self.fits: List[float] = []
-        self.best_global_genome: List[float] = []
+        self.best_global_genome: List[float] = [0.0 for _ in search_space]
         self.mutation_probability: float = mutation_probability
         self.initialize_population()
 
@@ -400,7 +400,7 @@ class RealGeneticAlgorithm(PopulationBaseOptimizer):
     ) -> List[float]:
         """
         Perform mutation on a child.
-        
+
         Note that if the probability is greater than that of mutation, the
         allele is maintained, only being exchanged if it is smaller.
 
@@ -433,7 +433,7 @@ class RealGeneticAlgorithm(PopulationBaseOptimizer):
         Returns:
             List[List[float]]: A list containing two child genomes.
         """
-        children = [[], []]
+        children: List[List[float]] = [[], []]
         beta = random.uniform(0, 1)
 
         for i in range(len(parent_0)):
