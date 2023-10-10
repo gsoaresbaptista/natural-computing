@@ -284,7 +284,8 @@ class BareBonesParticleSwarmOptimization(PopulationBaseOptimizer):
             best_personal_position: List[float] = cast(
                 List[float], particle['best_personal_position']
             )
-            best_personal_value: float = particle['best_personal_value']
+            best_personal_value: float = cast(
+                float, particle['best_personal_value'])
 
             # update particle position
             new_pos = [
