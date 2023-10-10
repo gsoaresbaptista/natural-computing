@@ -9,7 +9,8 @@ from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
-from natural_computing import LayerFactory, NeuralNetwork
+from .factories import LayerFactory
+from natural_computing.neural_network import NeuralNetwork
 
 
 def unpack_network(
