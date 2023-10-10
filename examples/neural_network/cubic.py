@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from natural_computing.utils import make_cubic, LayerFactory
-from natural_computing.neural_network import (
+from natural_computing import (
     NeuralNetwork,
     mse,
+    make_cubic,
+    LayerFactory,
 )
 
 

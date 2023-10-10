@@ -1,9 +1,9 @@
 import numpy as np
-from natural_computing.neural_network import (
+from natural_computing import (
     NeuralNetwork,
     softmax_neg_log_likelihood,
+    LayerFactory
 )
-from natural_computing.utils import LayerFactory
 
 
 if __name__ == '__main__':
