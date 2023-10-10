@@ -46,7 +46,20 @@ regularization_functions = {
 }
 
 
-def check_parameter(param: Any, default: Any, error_msg: str) -> None:
+def check_parameter(
+    param: Any, default: Any, error_msg: str
+) -> None:  # type: ignore[misc] # noqa: F821
+    """
+    Check if a parameter is None and provide a default value.
+
+    Args:
+        param (Any): The parameter to check.
+        default (Any): The default value to use if param is None.
+        error_msg (str): The error message to display if using the default.
+
+    Returns:
+        None: The parameter value or the default value if param is None.
+    """
     if param is None:
         print(
             f"* The param {error_msg} don't exists, "
