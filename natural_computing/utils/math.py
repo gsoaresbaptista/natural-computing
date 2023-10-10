@@ -2,24 +2,6 @@
 math.py - Math Operations Utilities
 
     This module provides utility functions for math operations.
-
-Functions:
-    sum_lists(list_0: List[float], list_1: List[float]) -> List[float]:
-        Add corresponding elements of two lists.
-
-    sub_lists(list_0: List[float], list_1: List[float]) -> List[float]:
-        Subtract corresponding elements of two lists.
-
-    def mul_list(constant: Number, list_0: List[float]) -> List[float]:
-        Multiply each element in the list by the constant value.
-
-    def bounded_random_vectors(
-        bounds: List[Tuple[Number, Number]]
-    ) -> List[float]:
-        Generate a vector of random numbers respecting the bounds vector.
-
-    def argsort(list: List[float]) -> List[int]:
-        Returns a list with the index in ascending order of value.
 """
 
 import random
@@ -178,3 +160,27 @@ def glorot_uniform_initializer(rows: int, cols: int) -> np.ndarray:
     """
     limit = np.sqrt(6.0 / (rows + cols))
     return 2 * limit * np.random.randn(rows, cols) - limit
+
+
+def r2_score(y_true, y_pred):
+    """
+    Calculate the R-squared (R2) score for a regression model.
+
+    R-squared is a statistical measure that represents the proportion
+    of the variance in the dependent variable that is explained by the
+    independent variables in a regression model. It provides an indication
+    of the goodness of fit of the model.
+
+    Args:
+        y_true (numpy.ndarray): The true target values (ground truth).
+        y_pred (numpy.ndarray): The predicted target values.
+
+    Returns:
+        float: The R-squared (R2) score, which is a value between 0 and 1.
+            A higher R2 score indicates a better fit of the model to the data.
+    """
+    ssr = np.sum((y_true - y_pred) ** 2)
+    sst = np.sum((y_true - np.mean(y_true)) ** 2)
+    r2 = 1 - (ssr / sst)
+
+    return r2

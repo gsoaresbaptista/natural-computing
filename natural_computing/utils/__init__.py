@@ -15,6 +15,7 @@ from .math import (
     sub_lists,
     sum_lists,
     zeros_initializer,
+    r2_score,
 )
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     'random_uniform_initializer',
     'glorot_uniform_initializer',
     'glorot_normal_initializer',
+    'r2_score',
 ]
