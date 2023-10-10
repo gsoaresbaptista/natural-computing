@@ -75,9 +75,7 @@ class RootMeanSquaredErrorForNN(BaseFunction):
         # Compute error
         y_pred = nn.predict(self._x_data)
         error = np.sqrt(np.mean((y_pred - self._y_data) ** 2))
-        weights = [layer._weights.squeeze() for layer in nn._layers]
-        error += self._l2_regularization * np.sum(
-            np.concatenate([w ** 2 for w in weights])
-        )
+        weights = [layer._weights.squeeze()**2 for layer in nn._layers]
+        error += self._l2_regularization * np.sum([w.sum() for w in weights])
 
         return error
